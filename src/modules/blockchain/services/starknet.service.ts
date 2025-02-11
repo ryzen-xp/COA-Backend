@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+jimport { Injectable } from '@nestjs/common';
 import { RpcProvider, Contract } from 'starknet';
 import { ConfigService } from '../../../common/config.service';
 import { NFTBalanceDto, NFTMetadataDto } from '../dtos/nft.dto';
@@ -16,7 +16,7 @@ export class StarknetService {
 
     const nodeUrl = this.configService.starknetNetwork
       ? networkUrls[this.configService.starknetNetwork] || this.configService.starknetNetwork
-      : "https://alpha4.starknet.io"; // Default a Goerli si no está definido
+      : "https://alpha4.starknet.io";
 
     if (!this.configService.contractAddress) {
       throw new Error("Contract address is not defined in ConfigService");
