@@ -1,71 +1,81 @@
-jimport { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { RpcProvider, Contract } from 'starknet';
-import { ConfigService } from '../../../common/config.service';
+import { ConfigService } from '@/common/config.service';
 import { NFTBalanceDto, NFTMetadataDto } from '../dtos/nft.dto';
 
 @Injectable()
-export class StarknetService {  
+export class StarknetService implements OnModuleInit {  
+  private readonly logger = new Logger(StarknetService.name);
   private provider: RpcProvider;
   private contract: Contract;
 
-  constructor(private readonly configService: ConfigService) {
-    const networkUrls: Record<string, string> = {
-      'mainnet-alpha': 'https://alpha-mainnet.starknet.io',
-      'goerli-alpha': 'https://alpha4.starknet.io',
-    };
+  constructor(private readonly configService: ConfigService) {}
 
-    const nodeUrl = this.configService.starknetNetwork
-      ? networkUrls[this.configService.starknetNetwork] || this.configService.starknetNetwork
-      : "https://alpha4.starknet.io";
-
-    if (!this.configService.contractAddress) {
-      throw new Error("Contract address is not defined in ConfigService");
-    }
-
-    if (!this.configService.walletAddress) {
-      throw new Error("Wallet address is not defined in ConfigService");
-    }
-
-    this.provider = new RpcProvider({ nodeUrl });
-
+  async onModuleInit() {
     try {
-      this.initializeContract();
+      await this.initializeStarknet();
     } catch (error) {
-      console.error("Error initializing contract:", error.message);
+      this.logger.error('Failed to initialize Starknet service', error);
+      throw error;
     }
   }
 
-  private initializeContract(): void {
+  private async initializeStarknet() {
+    // Validate configuration
     const contractAddress = this.configService.contractAddress;
+    const walletAddress = this.configService.walletAddress;
+    
+    if (!contractAddress) {
+      throw new Error('Contract address is not defined in configuration');
+    }
 
-    const contractAbi = [
-      {
-        "name": "balance_of",
-        "type": "function",
-        "inputs": [
-          { "name": "account", "type": "core::starknet::contract_address::ContractAddress" },
-          { "name": "token_id", "type": "core::integer::u256" }
-        ],
-        "outputs": [{ "type": "core::integer::u256" }],
-        "state_mutability": "view"
-      },
-      {
-        "name": "uri",
-        "type": "function",
-        "inputs": [{ "name": "token_id", "type": "core::integer::u256" }],
-        "outputs": [{ "type": "core::byte_array::ByteArray" }],
-        "state_mutability": "view"
-      }
-    ];
+    if (!walletAddress) {
+      throw new Error('Wallet address is not defined in configuration');
+    }
 
-    this.contract = new Contract(contractAbi, contractAddress, this.provider);
+    // Initialize provider
+    const nodeUrl = this.configService.starknetNetwork
+      ? this.configService.starknetNetwork
+      : "https://alpha4.starknet.io";
+    this.provider = new RpcProvider({ nodeUrl });
+    this.logger.log(`Initialized Starknet provider with network: ${this.configService.starknetNetwork}`);
+
+    try {
+      // Initialize contract
+      const contractAbi = [
+        {
+          "name": "balance_of",
+          "type": "function",
+          "inputs": [
+            { "name": "account", "type": "core::starknet::contract_address::ContractAddress" },
+            { "name": "token_id", "type": "core::integer::u256" }
+          ],
+          "outputs": [{ "type": "core::integer::u256" }],
+          "state_mutability": "view"
+        },
+        {
+          "name": "uri",
+          "type": "function",
+          "inputs": [{ "name": "token_id", "type": "core::integer::u256" }],
+          "outputs": [{ "type": "core::byte_array::ByteArray" }],
+          "state_mutability": "view"
+        }
+      ];
+
+      this.contract = new Contract(contractAbi, contractAddress, this.provider);
+      
+      this.logger.log('Successfully initialized Starknet contract');
+    } catch (error) {
+      this.logger.error('Failed to initialize contract', error);
+      throw new Error('Failed to initialize Starknet contract: ' + error.message);
+    }
   }
 
   async getBlock(): Promise<any> {
     try {
       return await this.provider.getBlock('latest');
     } catch (error) {
-      console.error("Error fetching latest block:", error.message);
+      this.logger.error("Error fetching latest block:", error.message);
       throw new Error("Failed to fetch latest block");
     }
   }
@@ -79,7 +89,7 @@ export class StarknetService {
       ]);
       return balance;
     } catch (error) {
-      console.error(`Error fetching contract status: ${error.message}`);
+      this.logger.error(`Error fetching contract status: ${error.message}`);
       throw new Error("Failed to fetch contract status");
     }
   }
@@ -93,7 +103,7 @@ export class StarknetService {
 
       return { account, tokenId, balance: Number(balance[0].low) };
     } catch (error) {
-      console.error(`Error fetching balance: ${error.message}`);
+      this.logger.error(`Error fetching balance: ${error.message}`);
       throw new Error("Failed to fetch balance");
     }
   }
@@ -111,7 +121,7 @@ export class StarknetService {
       const uriData = uriResponse[0].data.map((felt: any) => Buffer.from(felt, 'hex').toString()).join('');
       return { tokenId, uri: uriData };
     } catch (error) {
-      console.error(`Error fetching token URI: ${error.message}`);
+      this.logger.error(`Error fetching token URI: ${error.message}`);
       throw new Error(`Failed to fetch token URI for ID ${tokenId}`);
     }
   }
