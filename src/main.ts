@@ -15,11 +15,13 @@ async function bootstrap() {
     app.enableCors();
 
     // Add global pipes
-    app.useGlobalPipes(new ValidationPipe({
-      whitelist: true,
-      transform: true,
-      forbidNonWhitelisted: true,
-    }));
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        transform: true,
+        forbidNonWhitelisted: true,
+      }),
+    );
 
     // Start the server
     const port = process.env.PORT || 4000;
