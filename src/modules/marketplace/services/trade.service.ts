@@ -3,14 +3,13 @@ import { TradeRepository } from '../repositories/trade.repository';
 import { CreateTradeDto, UpdateTradeStatusDto } from '../dtos/trade.dto';
 
 class TradeService {
-    
   async createTrade(dto: CreateTradeDto): Promise<Trade> {
     const trade = TradeRepository.create({
       senderId: dto.senderId,
       receiverId: dto.receiverId,
       offeredItemId: dto.offeredItemId,
       requestedItemId: dto.requestedItemId,
-      status: TradeStatus.PENDING,  
+      status: TradeStatus.PENDING,
     });
     return TradeRepository.save(trade);
   }
@@ -26,7 +25,10 @@ class TradeService {
     });
   }
 
-  async updateTradeStatus(tradeId: number, dto: UpdateTradeStatusDto): Promise<Trade> {
+  async updateTradeStatus(
+    tradeId: number,
+    dto: UpdateTradeStatusDto,
+  ): Promise<Trade> {
     const trade = await TradeRepository.findOne({ where: { id: tradeId } });
     if (!trade) {
       throw new Error('Trade not found');
