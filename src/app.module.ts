@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './modules/users/user.module';
 import { BlockchainModule } from './modules/blockchain/blockchain.module';
+import { WalletModule } from './modules/users/wallet.module';
 
 /**
  * Main application module
@@ -36,6 +37,7 @@ import { BlockchainModule } from './modules/blockchain/blockchain.module';
     // }),
     UserModule,
     BlockchainModule,
+    WalletModule, 
   ],
 })
 export class AppModule {}
