@@ -3,7 +3,6 @@ import { NotificationRepository } from '../repositories/notification.repository'
 import { CreateNotificationDto } from '../dtos/notification.dto';
 
 class NotificationService {
-    
   async createNotification(dto: CreateNotificationDto): Promise<Notification> {
     const notification = NotificationRepository.create({
       userId: dto.userId,
@@ -29,7 +28,9 @@ class NotificationService {
   }
 
   async markAsRead(notificationId: number): Promise<Notification> {
-    const notification = await NotificationRepository.findOne({ where: { id: notificationId } });
+    const notification = await NotificationRepository.findOne({
+      where: { id: notificationId },
+    });
     if (!notification) {
       throw new Error('Notification not found');
     }
