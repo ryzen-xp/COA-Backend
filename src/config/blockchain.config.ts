@@ -12,5 +12,7 @@ export const blockchainValidationSchema = Joi.object({
   CONTRACT_ADDRESS: Joi.string().required(),
   WALLET_ADDRESS: Joi.string().required(),
   WALLET_PRIVATE_KEY: Joi.string().required(),
-  STARKNET_NETWORK: Joi.string().valid('mainnet-alpha', 'goerli-alpha').default('goerli-alpha'),
+  STARKNET_NETWORK: Joi.string()
+    .valid('mainnet-alpha', 'goerli-alpha', 'sepolia-alpha')
+    .default('goerli-alpha'),
 });

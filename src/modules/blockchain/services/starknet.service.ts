@@ -36,7 +36,7 @@ export class StarknetService implements OnModuleInit {
     // Initialize provider
     const nodeUrl = this.configService.starknetNetwork
       ? this.configService.starknetNetwork
-      : 'https://alpha4.starknet.io';
+      : 'https://starknet-sepolia.public.blastapi.io';
     this.provider = new RpcProvider({ nodeUrl });
     this.logger.log(
       `Initialized Starknet provider with network: ${this.configService.starknetNetwork}`,
