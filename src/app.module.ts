@@ -2,16 +2,17 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './modules/users/user.module';
 import { BlockchainModule } from './modules/blockchain/blockchain.module';
+import { StarknetRouterModule } from './routers';
+import { StarknetController } from './modules/blockchain/controllers/starknet.controller';
 import { WalletModule } from './modules/users/wallet.module';
-
 /**
  * Main application module
- * 
+ *
  * Database Configuration (Commented for future use):
  * Uncomment the TypeOrmModule.forRoot() section when:
  * 1. You need to connect to a PostgreSQL database
  * 2. You're moving to production
- * 
+ *
  * For local testing without database:
  * - Keep TypeOrmModule commented out
  * - Use in-memory storage in services
@@ -37,7 +38,8 @@ import { WalletModule } from './modules/users/wallet.module';
     // }),
     UserModule,
     BlockchainModule,
-    WalletModule, 
+    StarknetRouterModule,
   ],
+  controllers: [StarknetController],
 })
 export class AppModule {}

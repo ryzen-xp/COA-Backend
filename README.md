@@ -32,7 +32,11 @@ DB_PORT=5432
 DB_USER=postgres
 DB_PASS=password
 DB_NAME=coa_database
-JWT_SECRET=supersecret key
+JWT_SECRET=supersecretkey
+CONTRACT_ADDRESS=0x040811bb6636316c9f1809e2898285976d2a0db66e33703defbfb0c7572b87ad
+WALLET_ADDRESS=0x066EE9d5F6791270d7cD1314ddB9fc8f7EdCb59E2847e2b13D57A06e7c988D63
+WALLET_PRIVATE_KEY=0x0363c39930af5bfd1890d94963a503fec02cc4965080517dc2888c1671a5e25a
+STARKNET_NETWORK=sepolia-alpha
 
 ```
 
@@ -43,7 +47,7 @@ docker-compose -d
 ```
 ### 4️⃣ Run the server
 ```sh
-start npm run: dev
+npm run start:dev
 ```
 
 ```sh
