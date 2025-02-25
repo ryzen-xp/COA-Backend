@@ -47,7 +47,7 @@ docker-compose -d
 ```
 ### 4️⃣ Run the server
 ```sh
-start npm run: dev
+npm run start:dev
 ```
 
 ```sh
