@@ -2,6 +2,7 @@ import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { RpcProvider, Contract } from 'starknet';
 import { ConfigService } from '@/common/config.service';
 import { NFTBalanceDto, NFTMetadataDto } from '../dtos/nft.dto';
+import { TransferDto } from '../dtos/transfer.dto';
 
 @Injectable()
 export class StarknetService implements OnModuleInit {
@@ -34,9 +35,8 @@ export class StarknetService implements OnModuleInit {
     }
 
     // Initialize provider
-    const nodeUrl = this.configService.starknetNetwork
-      ? this.configService.starknetNetwork
-      : 'https://starknet-sepolia.public.blastapi.io';
+    const nodeUrl = this.configService.getNodeUrl();
+
     this.provider = new RpcProvider({ nodeUrl });
     this.logger.log(
       `Initialized Starknet provider with network: ${this.configService.starknetNetwork}`,
@@ -65,6 +65,34 @@ export class StarknetService implements OnModuleInit {
           outputs: [{ type: 'core::byte_array::ByteArray' }],
           state_mutability: 'view',
         },
+        {
+          name: 'safe_transfer_from',
+          type: 'function',
+          inputs: [
+            {
+              name: 'from',
+              type: 'core::starknet::contract_address::ContractAddress',
+            },
+            {
+              name: 'to',
+              type: 'core::starknet::contract_address::ContractAddress',
+            },
+            {
+              name: 'token_id',
+              type: 'core::integer::u256',
+            },
+            {
+              name: 'value',
+              type: 'core::integer::u256',
+            },
+            {
+              name: 'data',
+              type: 'core::array::Span::<core::felt252>',
+            },
+          ],
+          outputs: [],
+          state_mutability: 'external',
+        },
       ];
 
       this.contract = new Contract(contractAbi, contractAddress, this.provider);
@@ -90,11 +118,23 @@ export class StarknetService implements OnModuleInit {
   async getContractStatus(): Promise<any> {
     try {
       const tokenId = { low: BigInt(1), high: BigInt(0) };
+
+      // Ensure walletAddress is properly converted
+      const walletAddress = BigInt(
+        this.configService.walletAddress.startsWith('0x'),
+      );
+
       const balance = await this.contract.call('balance_of', [
-        BigInt(this.configService.walletAddress),
+        walletAddress,
         tokenId,
       ]);
-      return balance;
+
+      // Convert BigInt results to string before returning
+      return JSON.parse(
+        JSON.stringify(balance, (_, v) =>
+          typeof v === 'bigint' ? v.toString() : v,
+        ),
+      );
     } catch (error) {
       this.logger.error(`Error fetching contract status: ${error.message}`);
       throw new Error('Failed to fetch contract status');
@@ -108,7 +148,13 @@ export class StarknetService implements OnModuleInit {
         { low: BigInt(tokenId), high: BigInt(0) },
       ]);
 
-      return { account, tokenId, balance: Number(balance[0].low) };
+      const bal = JSON.parse(
+        JSON.stringify(balance, (_, v) =>
+          typeof v === 'bigint' ? v.toString() : v,
+        ),
+      );
+
+      return { account, tokenId, balance: bal };
     } catch (error) {
       this.logger.error(`Error fetching balance: ${error.message}`);
       throw new Error('Failed to fetch balance');
@@ -132,6 +178,25 @@ export class StarknetService implements OnModuleInit {
     } catch (error) {
       this.logger.error(`Error fetching token URI: ${error.message}`);
       throw new Error(`Failed to fetch token URI for ID ${tokenId}`);
+    }
+  }
+
+  async transferNFT(transferDto: TransferDto): Promise<void> {
+    try {
+      const { from, to, tokenId } = transferDto;
+      await this.contract.invoke('safe_transfer_from', [
+        BigInt(from),
+        BigInt(to),
+        { low: BigInt(tokenId), high: BigInt(0) },
+        { low: BigInt(1), high: BigInt(0) },
+        [],
+      ]);
+      this.logger.log(
+        `Successfully transferred token ${tokenId} from ${from} to ${to}`,
+      );
+    } catch (error) {
+      this.logger.error(`Error transferring NFT: ${error.message}`);
+      throw new Error(`Failed to transfer token ${transferDto.tokenId}`);
     }
   }
 }

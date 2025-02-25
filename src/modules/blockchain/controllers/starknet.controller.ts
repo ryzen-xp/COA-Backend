@@ -1,6 +1,7 @@
-import { Controller, Get, Param, Response } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Response } from '@nestjs/common';
 import { Response as Res } from 'express';
 import { StarknetService } from '../services/starknet.service';
+import { TransferDto } from '../dtos/transfer.dto';
 
 @Controller('blockchain')
 export class StarknetController {
@@ -53,8 +54,18 @@ export class StarknetController {
     }
   }
 
-  @Get('test')
-  async getHello(@Response() res: Res): Promise<void> {
-    res.status(200).json({ message: 'Hello, World!' });
+  @Post('transfer')
+  async transferNFT(
+    @Body() transferDto: TransferDto,
+    @Response() res: Res,
+  ): Promise<void> {
+    try {
+      await this.starknetService.transferNFT(transferDto);
+      res.status(200).json({
+        message: `Token ${transferDto.tokenId} transferred from ${transferDto.from} to ${transferDto.to}`,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
   }
 }
