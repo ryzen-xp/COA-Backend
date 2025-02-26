@@ -1,25 +1,33 @@
 import { IsNumber, IsPositive, IsNotEmpty, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateTransactionDto {
-  @IsNumber({}, { message: 'buyerId must be a number' })
-  @IsNotEmpty({ message: 'buyerId is required' })
+  @IsNumber()
+  @IsNotEmpty()
   buyerId: number;
 
-  @IsNumber({}, { message: 'nftId must be a number' })
-  @IsNotEmpty({ message: 'nftId is required' })
+  @IsNumber()
+  @IsNotEmpty()
   nftId: number;
 
-  @IsNumber({}, { message: 'price must be a number' })
-  @IsPositive({ message: 'price must be greater than 0' })
+  @IsNumber()
+  @IsPositive()
   price: number;
 }
 
-export class GetTransactionsDto {
-  @IsNumber({}, { message: 'buyerId must be a number' })
+export class TransactionFilterDto {
   @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
   buyerId?: number;
 
-  @IsNumber({}, { message: 'sellerId must be a number' })
   @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
   sellerId?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Type(() => Number)
+  nftId?: number;
 }
