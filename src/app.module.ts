@@ -9,7 +9,7 @@ import { WalletModule } from './modules/users/wallet.module';
 import { WalletController } from './modules/users/controllers/wallet.controller';
 //import { NFTModule } from './modules/marketplace/nft.module';
 //import { TypeOrmModule } from '@nestjs/typeorm';
-
+//import { TransactionModule } from './modules/marketplace/transaction.module';
 /**
  * Main application module
  *
@@ -40,8 +40,7 @@ import { WalletController } from './modules/users/controllers/wallet.controller'
   //     synchronize: process.env.NODE_ENV !== 'production', // 🚨 Solo usar en desarrollo
   //     logging: process.env.NODE_ENV !== 'production',
   //   }),
-    
-    UserModule,
+        UserModule,
     // TransactionModule,
     //NFTModule,
     BlockchainModule,
