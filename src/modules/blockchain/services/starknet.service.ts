@@ -146,7 +146,8 @@ export class StarknetService implements OnModuleInit {
       const account = new Account(
         this.provider,
         adminAddress,
-        adminPrivateKey
+        adminPrivateKey,
+        '1'
       );
 
       this.logger.log(`Attempting to transfer token ${tokenId} from ${adminAddress} to ${to}`);

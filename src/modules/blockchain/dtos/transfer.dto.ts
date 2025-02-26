@@ -3,14 +3,6 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class TransferDto {
   @ApiProperty({
-    description: 'Source account address',
-    example: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
-  })
-  @IsString()
-  @IsNotEmpty()
-  from: string;
-
-  @ApiProperty({
     description: 'Destination account address',
     example: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890'
   })

@@ -83,7 +83,7 @@ export class StarknetController {
     try {
       await this.starknetService.transferNFT(transferDto);
       res.status(200).json({
-        message: `Token ${transferDto.tokenId} transferred from ${transferDto.from} to ${transferDto.to}`,
+        message: `Token ${transferDto.tokenId} transferred to ${transferDto.to}`,
       });
     } catch (error) {
       res.status(500).json({ message: error.message });
