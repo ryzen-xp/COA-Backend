@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './modules/users/user.module';
@@ -41,6 +42,7 @@ import { LeaderboardController } from './modules/game/controlller/laderboard.con
     BlockchainModule,
     StarknetRouterModule,
     LaderboardModule,
+   // WalletModule,
   ],
   controllers: [StarknetController, LeaderboardController],
 })
