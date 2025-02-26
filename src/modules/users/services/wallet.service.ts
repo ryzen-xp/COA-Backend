@@ -1,21 +1,25 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { WalletRepository } from '../repositories/wallet.repository';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { WalletRepository } from "../repositories/wallet.repository";
+import { WalletResponseDTO  } from "../dtos/wallet.dto";
+import { Wallet } from "../entities/wallet.entity";
+import type { createWalletDTO } from "../dtos/wallet.dto";
 
 @Injectable()
 export class WalletService {
-  constructor(private readonly walletRepository: WalletRepository) {}
+    constructor(
+        private readonly walletRepository: WalletRepository
+    ) {}
 
-  async getWalletByUserId(userId: number) {
-    const wallet = await this.walletRepository.findByUserId(userId);
-    if (!wallet) throw new NotFoundException('Wallet not found');
-    return wallet;
-  }
+    async create(dto: createWalletDTO): Promise<Wallet> {
+        return await this.walletRepository.create(dto);
+    }
 
-  async updateBalance(userId: number, amount: number) {
-    const wallet = await this.walletRepository.findByUserId(userId);
-    if (!wallet) throw new NotFoundException('Wallet not found');
     
-    await this.walletRepository.updateBalance(wallet.id, amount);
-    return { message: 'Balance updated successfully' };
-  }
+    async findAll(): Promise<Wallet[]> {
+        return await this.walletRepository.findAll();
+    }
+
+    async deleteUserAchievement(user_id: string): Promise<void> {
+        return this.walletRepository.delete(user_id);
+      }
 }

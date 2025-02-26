@@ -1,10 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, PrimaryColumn } from 'typeorm';
 import { User } from './user.entity';
 
-@Entity()
+@Entity("wallet")
 export class Wallet {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn("uuid")
+  wallet_id: string;
 
   @ManyToOne(() => User, (user) => user.wallet, { onDelete: 'CASCADE' })
   user: User;

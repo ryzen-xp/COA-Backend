@@ -1,17 +1,25 @@
-import { EntityRepository, Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { DataSource, Repository } from 'typeorm';
 import { Wallet } from '../entities/wallet.entity';
 
-@EntityRepository(Wallet)
-export class WalletRepository extends Repository<Wallet> {
-  async findByUserId(userId: number): Promise<Wallet | null> {
-    return this.findOne({ where: { user: { id: userId } } });
+@Injectable()
+export class WalletRepository {
+  private readonly repo: Repository<Wallet>;
+
+  constructor(private readonly dataSource: DataSource) {
+    this.repo = this.dataSource.getRepository(Wallet); 
   }
 
-  async updateBalance(walletId: number, amount: number): Promise<void> {
-    await this.createQueryBuilder()
-      .update(Wallet)
-      .set({ balance: () => `balance + ${amount}` })
-      .where('id = :id', { id: walletId })
-      .execute();
+  async create(walletData: Partial<Wallet>): Promise<Wallet> {
+    const wallet = this.repo.create(walletData);
+    return await this.repo.save(wallet);
+  }
+
+  async findAll(): Promise<Wallet[]> {
+    return await this.repo.find();
+  }
+
+  async delete(walletID: string): Promise<void> {
+    await this.repo.delete({ wallet_id: walletID });
   }
 }
