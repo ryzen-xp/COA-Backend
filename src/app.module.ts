@@ -5,9 +5,11 @@ import { UserModule } from './modules/users/user.module';
 import { BlockchainModule } from './modules/blockchain/blockchain.module';
 import { StarknetRouterModule } from './routers';
 import { StarknetController } from './modules/blockchain/controllers/starknet.controller';
-//import { TransactionModule } from './modules/marketplace/transaction.module';
+import { WalletModule } from './modules/users/wallet.module';
+import { WalletController } from './modules/users/controllers/wallet.controller';
 //import { NFTModule } from './modules/marketplace/nft.module';
 //import { TypeOrmModule } from '@nestjs/typeorm';
+//import { TransactionModule } from './modules/marketplace/transaction.module';
 /**
  * Main application module
  *
@@ -38,12 +40,12 @@ import { StarknetController } from './modules/blockchain/controllers/starknet.co
   //     synchronize: process.env.NODE_ENV !== 'production', // 🚨 Solo usar en desarrollo
   //     logging: process.env.NODE_ENV !== 'production',
   //   }),
-    
-    UserModule,
-    //TransactionModule,
+        UserModule,
+    // TransactionModule,
     //NFTModule,
     BlockchainModule,
     StarknetRouterModule,
+   // WalletModule,
   ],
   controllers: [StarknetController],
 })
