@@ -112,25 +112,22 @@ export class StarknetService implements OnModuleInit {
 
   async getTokenURI(tokenId: string): Promise<NFTMetadataDto> {
     try {
-      const uriResponse = await this.contract.call("uri", [
+      const uriResponse = await this.contract.callStatic.uri(
         { low: BigInt(tokenId), high: BigInt(0) },
-      ]);
+      );
 
-      if (!uriResponse || !uriResponse[0]?.data) {
+      if (!uriResponse) {
         return { tokenId, uri: "" };
       }
 
-      const uriData = uriResponse[0].data
-        .map((felt: any) => Buffer.from(felt, 'hex').toString())
-        .join('');
-      return { tokenId, uri: uriData };
+      return { tokenId, uri: uriResponse };
     } catch (error) {
       this.logger.error(`Error fetching token URI: ${error.message}`);
       throw new Error(`Failed to fetch token URI for ID ${tokenId}`);
     }
   }
 
-  async transferNFT(transferDto: TransferDto): Promise<void> {
+  async transferNFT(transferDto: TransferDto): Promise<{ hash: string }> {
     try {
       const { to, tokenId } = transferDto;
 
@@ -172,6 +169,8 @@ export class StarknetService implements OnModuleInit {
       this.logger.log(
         `Successfully initiated transfer of token ${tokenId} to ${to}. Transaction hash: ${tx.transaction_hash}`,
       );
+
+      return { hash: tx.transaction_hash };
     } catch (error) {
       this.logger.error(`Error transferring NFT: ${error.message}`, error.stack);
       throw new Error(`Failed to transfer token ${transferDto.tokenId}: ${error.message}`);

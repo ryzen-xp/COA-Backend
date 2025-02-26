@@ -81,9 +81,10 @@ export class StarknetController {
     @Response() res: Res,
   ): Promise<void> {
     try {
-      await this.starknetService.transferNFT(transferDto);
+      const tx = await this.starknetService.transferNFT(transferDto);
       res.status(200).json({
         message: `Token ${transferDto.tokenId} transferred to ${transferDto.to}`,
+        hash: tx.hash
       });
     } catch (error) {
       res.status(500).json({ message: error.message });
