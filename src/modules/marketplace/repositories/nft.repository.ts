@@ -1,11 +1,13 @@
-import { getRepository, Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { DataSource, Repository } from 'typeorm';
 import { NFT } from '../entities/nft.entity';
 
+@Injectable()
 export class NFTRepository {
   private repo: Repository<NFT>;
 
-  constructor() {
-    this.repo = getRepository(NFT);
+  constructor(private readonly dataSource: DataSource) {
+    this.repo = this.dataSource.getRepository(NFT);
   }
 
   async create(nftData: Partial<NFT>): Promise<NFT> {
