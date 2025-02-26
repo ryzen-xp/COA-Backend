@@ -1,21 +1,23 @@
-import { Controller, Get, Post, Param, Body } from '@nestjs/common';
-import { LeaderboardService } from '../../game/services/leaderboard.service';
+import { Controller, Get, Post, Body, Param, HttpException, HttpStatus, Delete } from '@nestjs/common';
+import { LeaderboardService } from '../services/leaderboard.service';
 import { LeaderboardDTO } from '../dtos/leaderboard.dto';
+import type { LeaderboardResponseDTO } from '../dtos/leaderboard.dto';
 
 @Controller('leaderboard')
 export class LeaderboardController {
-  constructor(private leaderboardService: LeaderboardService) {}
+  constructor(private readonly walletService: LeaderboardService) {}
 
-  @Post('update')
-  updateScore(@Body() leaderboardDTO: LeaderboardDTO) {
-    return this.leaderboardService.updateScore(
-      leaderboardDTO.userId,
-      leaderboardDTO.score,
-    );
+  @Post()
+  async create(@Body() createUserAchievementDto: LeaderboardDTO): Promise<LeaderboardResponseDTO> {
+    try {
+      return await this.walletService.create(createUserAchievementDto);
+    } catch (error) {
+      throw new HttpException('Failed to create leaderboard achievement', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  @Get('top/:limit')
-  getTopPlayers(@Param('limit') limit: number) {
-    return this.leaderboardService.getTopPlayers(Number(limit));
+  @Get()
+  async getWallet() {
+    return this.walletService.findAll();
   }
 }

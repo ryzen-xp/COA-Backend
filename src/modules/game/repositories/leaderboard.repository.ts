@@ -1,26 +1,25 @@
 import { Injectable } from '@nestjs/common';
-import { Repository, DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Leaderboard } from '../entities/laderboard.entity';
 
 @Injectable()
-export class LeaderboardRepository extends Repository<Leaderboard> {
-  constructor(private dataSource: DataSource) {
-    const repository = dataSource.getRepository(Leaderboard);
-    super(repository.target, repository.manager, repository.queryRunner);
+export class LeaderboardRepository {
+  private readonly repo: Repository<Leaderboard>;
+
+  constructor(private readonly dataSource: DataSource) {
+    this.repo = this.dataSource.getRepository(Leaderboard);
   }
 
-  async getTopPlayers(limit: number): Promise<Leaderboard[]> {
-    return this.createQueryBuilder('leaderboard')
-      .orderBy('leaderboard.score', 'DESC')
-      .limit(limit)
-      .getMany();
+  async create(walletData: Partial<Leaderboard>): Promise<Leaderboard> {
+    const wallet = this.repo.create(walletData);
+    return await this.repo.save(wallet);
   }
 
-  async getPlayerRank(userId: number): Promise<Leaderboard | null> {
-    return this.findOne({ where: { userId } });
+  async findAll(): Promise<Leaderboard[]> {
+    return await this.repo.find();
   }
 
-  async saveEntry(entry: Leaderboard): Promise<void> {
-    await this.save(entry);
+  async delete(walletID: number): Promise<void> {
+    await this.repo.delete({ id: walletID });
   }
 }

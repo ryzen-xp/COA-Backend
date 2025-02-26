@@ -1,24 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { LeaderboardRepository } from '../repositories/leaderboard.repository';
-import { Leaderboard } from '../../game/entities/laderboard.entity';
+import { Leaderboard } from '../entities/laderboard.entity';
+import type { LeaderboardDTO } from '../dtos/leaderboard.dto';
 
 @Injectable()
 export class LeaderboardService {
-  constructor(private leaderboardRepository: LeaderboardRepository) {}
+  constructor(private readonly walletRepository: LeaderboardRepository) {}
 
-  async updateScore(userId: number, score: number): Promise<void> {
-    let entry = await this.leaderboardRepository.getPlayerRank(userId);
-    if (!entry) {
-      entry = new Leaderboard();
-      entry.userId = userId;
-      entry.score = score;
-    } else {
-      entry.score += score;
-    }
-    await this.leaderboardRepository.saveEntry(entry);
+  async create(dto: LeaderboardDTO): Promise<Leaderboard> {
+    return await this.walletRepository.create(dto);
   }
 
-  async getTopPlayers(limit: number) {
-    return this.leaderboardRepository.getTopPlayers(limit);
+  async findAll(): Promise<Leaderboard[]> {
+    return await this.walletRepository.findAll();
+  }
+  async deleteUserAchievement(id: number): Promise<void> {
+    return this.walletRepository.delete(id);
   }
 }

@@ -2,7 +2,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  UpdateDateColumn,
+  //UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('leaderboard')
@@ -19,6 +19,6 @@ export class Leaderboard {
   @Column({ type: 'int', default: 0 })
   rank: number;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+  // @UpdateDateColumn()
+  // updatedAt: Date;
 }
