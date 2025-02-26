@@ -3,33 +3,42 @@ import { TradeRepository } from '../repositories/trade.repository';
 import { CreateTradeDto, UpdateTradeStatusDto } from '../dtos/trade.dto';
 
 class TradeService {
+
+  private tradeRepository: TradeRepository;
+
+  constructor() {
+    this.tradeRepository = new TradeRepository();
+  }
+
+
   async createTrade(dto: CreateTradeDto): Promise<Trade> {
-    const trade = TradeRepository.create({
+    const trade = await this.tradeRepository.create({
       senderId: dto.senderId,
       receiverId: dto.receiverId,
       offeredItemId: dto.offeredItemId,
       requestedItemId: dto.requestedItemId,
       status: TradeStatus.PENDING,
     });
-    return TradeRepository.save(trade);
+    return this.tradeRepository.create(trade);
   }
 
   async getTradeById(tradeId: number): Promise<Trade | null> {
-    return TradeRepository.findOne({ where: { id: tradeId } });
+    return this.tradeRepository.findById(tradeId);
   }
 
   async getUserTrades(userId: number): Promise<Trade[]> {
-    return TradeRepository.find({
-      where: [{ senderId: userId }, { receiverId: userId }],
-      order: { createdAt: 'DESC' },
-    });
+    return this.tradeRepository.findByUserId(userId);
   }
 
   async updateTradeStatus(
     tradeId: number,
     dto: UpdateTradeStatusDto,
   ): Promise<Trade> {
+
     const trade = await TradeRepository.findOne({ where: { id: tradeId } });
+
+    const trade = await this.tradeRepository.findById(tradeId);
+
     if (!trade) {
       throw new Error('Trade not found');
     }
@@ -38,8 +47,8 @@ class TradeService {
       throw new Error('Invalid trade status');
     }
 
-    trade.status = dto.status;
-    return TradeRepository.save(trade);
+    await this.tradeRepository.updateTradeStatus(tradeId, dto.status);
+    return { ...trade, status: dto.status };
   }
 }
 

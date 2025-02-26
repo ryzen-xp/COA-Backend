@@ -20,3 +20,18 @@ import { MarketplaceListing } from './entities/marketplace-listing.entity';
   exports: [MarketplaceListingService], // ✅ Export service for use in other modules
 })
 export class MarketplaceModule {}
+
+import { ChatController } from './controllers/chat.controller';
+import { ChatService } from './services/chat.service';
+import { ChatRepository } from './repositories/chat.repository';
+
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([ChatRepository]),
+    // ... other imports
+  ],
+  controllers: [ChatController, /* ... other controllers */],
+  providers: [ChatService, /* ... other services */],
+})
+export class MarketplaceModule {} 
+
