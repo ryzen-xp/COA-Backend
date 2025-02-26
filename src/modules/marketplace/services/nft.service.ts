@@ -1,9 +1,15 @@
-import { getRepository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { NFT } from '../entities/nft.entity';
 import { CreateNFTDto, UpdateNFTListingDto } from '../dtos/nft.dto';
 
-class NFTService {
-  private nftRepository = getRepository(NFT);
+@Injectable()
+export class NFTService {
+  constructor(
+    @InjectRepository(NFT)
+    private readonly nftRepository: Repository<NFT>,
+  ) {}
 
   async createNFT(dto: CreateNFTDto): Promise<NFT> {
     const nft = this.nftRepository.create({
@@ -14,15 +20,15 @@ class NFTService {
       isListed: dto.isListed ?? false,
       price: dto.price ?? 0,
     });
-    return this.nftRepository.save(nft);
+    return await this.nftRepository.save(nft);
   }
 
   async getNFTById(id: number): Promise<NFT | null> {
-    return this.nftRepository.findOne({ where: { id } });
+    return await this.nftRepository.findOne({ where: { id } });
   }
 
   async getAvailableNFTs(): Promise<NFT[]> {
-    return this.nftRepository.find({ where: { isListed: true } });
+    return await this.nftRepository.find({ where: { isListed: true } });
   }
 
   async updateNFTListing(id: number, dto: UpdateNFTListingDto): Promise<NFT> {
@@ -34,8 +40,6 @@ class NFTService {
     if (dto.price !== undefined) {
       nft.price = dto.price;
     }
-    return this.nftRepository.save(nft);
+    return await this.nftRepository.save(nft);
   }
 }
-
-export default new NFTService();

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './modules/users/user.module';
@@ -5,7 +6,9 @@ import { BlockchainModule } from './modules/blockchain/blockchain.module';
 import { StarknetRouterModule } from './routers';
 import { StarknetController } from './modules/blockchain/controllers/starknet.controller';
 import { LaderboardModule } from './modules/game/laderboard.module';
-
+//import { NFTModule } from './modules/marketplace/nft.module';
+//import { TypeOrmModule } from '@nestjs/typeorm';
+//import { TransactionModule } from './modules/marketplace/transaction.module';
 /**
  * Main application module
  *
@@ -23,24 +26,26 @@ import { LaderboardModule } from './modules/game/laderboard.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    // Database configuration - Uncomment when database connection is needed
-    // TypeOrmModule.forRoot({
-    //   // Production configuration
-    //   type: 'postgres',
-    //   host: process.env.DB_HOST || 'localhost',
-    //   port: parseInt(process.env.DB_PORT) || 5432,
-    //   username: process.env.DB_USERNAME,
-    //   password: process.env.DB_PASSWORD,
-    //   database: process.env.DB_DATABASE,
-    //   entities: [__dirname + '/**/*.entity{.ts,.js}'],
-    //   synchronize: process.env.NODE_ENV !== 'production', // Set to false in production
-    //   logging: process.env.NODE_ENV !== 'production',     // Set to false in production
-    //   ssl: process.env.DB_SSL === 'true',                // Enable SSL in production
-    // }),
-    UserModule,
+  //Database configuration - Uncomment when database connection is needed
+  //  TypeOrmModule.forRoot({
+  //  name: 'default',
+  //  type: 'postgres',
+  //    host: process.env.DB_HOST || 'localhost',
+  //     port: parseInt(process.env.DB_PORT) || 5433,
+  //    username: process.env.DB_USER || 'postgres',
+  //    password: process.env.DB_PASS || '12345',
+  //    database: process.env.DB_NAME || 'coa_database',
+  //    entities: [__dirname + '/**/*.entity{.ts,.js}'], // 🟢 Busca todas las entidades
+  //     synchronize: process.env.NODE_ENV !== 'production', // 🚨 Solo usar en desarrollo
+  //     logging: process.env.NODE_ENV !== 'production',
+  //   }),
+        UserModule,
+    // TransactionModule,
+    //NFTModule,
     BlockchainModule,
     StarknetRouterModule,
     LaderboardModule,
+   // WalletModule,
   ],
   controllers: [StarknetController],
 })

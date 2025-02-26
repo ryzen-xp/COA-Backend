@@ -1,58 +1,63 @@
-import { Request, Response } from 'express';
-import NFTService from '../services/nft.service';
+import { Body, Controller, Get, Param, Post, Put,  } from '@nestjs/common';
+import { NFTService } from '../services/nft.service';
 import { CreateNFTDto, UpdateNFTListingDto } from '../dtos/nft.dto';
-import { plainToInstance } from 'class-transformer';
-import { validate } from 'class-validator';
 
-class NFTController {
-  async createNFT(req: Request, res: Response) {
+@Controller('nfts')
+export class NFTController {
+  constructor(private readonly nftService: NFTService) {}
+
+  @Post()
+  async createNFT(@Body() createNFTDto: CreateNFTDto) {
     try {
-      const createNFTDto = plainToInstance(CreateNFTDto, req.body);
-      const errors = await validate(createNFTDto);
-      if (errors.length > 0) {
-        return res.status(400).json({ errors });
-      }
-      const nft = await NFTService.createNFT(createNFTDto);
-      res.status(201).json(nft);
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
+      return await this.nftService.createNFT(createNFTDto);
+    } catch (error: unknown) {
+      return {
+        statusCode: 400,
+        message: error instanceof Error ? error.message : 'Unknown error occurred',
+      };
     }
   }
 
-  async getNFTById(req: Request, res: Response) {
+  @Get(':id')
+  async getNFTById(@Param('id') id: number) {
     try {
-      const nft = await NFTService.getNFTById(Number(req.params.id));
+      const nft = await this.nftService.getNFTById(id);
       if (!nft) {
-        return res.status(404).json({ error: 'NFT not found' });
+        return {
+          statusCode: 404,
+          message: 'NFT not found',
+        };
       }
-      res.json(nft);
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
+      return nft;
+    } catch (error: unknown) {
+      return {
+        statusCode: 400,
+        message: error instanceof Error ? error.message : 'Failed to retrieve NFT',
+      };
     }
   }
 
-  async getAvailableNFTs(req: Request, res: Response) {
+  @Get()
+  async getAvailableNFTs() {
     try {
-      const nfts = await NFTService.getAvailableNFTs();
-      res.json(nfts);
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
+      return await this.nftService.getAvailableNFTs();
+    } catch (error: unknown) {
+      return {
+        statusCode: 400,
+        message: error instanceof Error ? error.message : 'Failed to retrieve NFTs',
+      };
     }
   }
 
-  async updateNFTListing(req: Request, res: Response) {
+  @Put(':id/listing')
+  async updateNFTListing(@Param('id') id: number, @Body() updateDto: UpdateNFTListingDto) {
     try {
-      const updateDto = plainToInstance(UpdateNFTListingDto, req.body);
-      const errors = await validate(updateDto);
-      if (errors.length > 0) {
-        return res.status(400).json({ errors });
-      }
-      const nft = await NFTService.updateNFTListing(Number(req.params.id), updateDto);
-      res.json(nft);
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
+      return await this.nftService.updateNFTListing(id, updateDto);
+    } catch (error: unknown) {
+      return {
+        statusCode: 400,
+        message: error instanceof Error ? error.message : 'Failed to update NFT listing',
+      };
     }
   }
 }
-
-export default new NFTController();
