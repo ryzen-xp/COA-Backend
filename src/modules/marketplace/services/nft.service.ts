@@ -1,10 +1,12 @@
+import { getRepository } from 'typeorm';
 import { NFT } from '../entities/nft.entity';
-import { NFTRepository } from '../repositories/nft.repository';
 import { CreateNFTDto, UpdateNFTListingDto } from '../dtos/nft.dto';
 
 class NFTService {
+  private nftRepository = getRepository(NFT);
+
   async createNFT(dto: CreateNFTDto): Promise<NFT> {
-    const nft = NFTRepository.create({
+    const nft = this.nftRepository.create({
       name: dto.name,
       description: dto.description,
       imageUrl: dto.imageUrl,
@@ -12,19 +14,19 @@ class NFTService {
       isListed: dto.isListed ?? false,
       price: dto.price ?? 0,
     });
-    return NFTRepository.save(nft);
+    return this.nftRepository.save(nft);
   }
 
   async getNFTById(id: number): Promise<NFT | null> {
-    return NFTRepository.findOne({ where: { id } });
+    return this.nftRepository.findOne({ where: { id } });
   }
 
   async getAvailableNFTs(): Promise<NFT[]> {
-    return NFTRepository.find({ where: { isListed: true } });
+    return this.nftRepository.find({ where: { isListed: true } });
   }
 
   async updateNFTListing(id: number, dto: UpdateNFTListingDto): Promise<NFT> {
-    const nft = await NFTRepository.findOne({ where: { id } });
+    const nft = await this.nftRepository.findOne({ where: { id } });
     if (!nft) {
       throw new Error('NFT not found');
     }
@@ -32,7 +34,7 @@ class NFTService {
     if (dto.price !== undefined) {
       nft.price = dto.price;
     }
-    return NFTRepository.save(nft);
+    return this.nftRepository.save(nft);
   }
 }
 

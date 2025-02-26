@@ -28,6 +28,7 @@ export class ConfigService {
     const networkUrls: Record<string, string> = {
       'mainnet-alpha': 'https://alpha-mainnet.starknet.io',
       'goerli-alpha': 'https://alpha4.starknet.io',
+      'sepolia-alpha': 'https://starknet-sepolia.public.blastapi.io',
     };
 
     const network = this.starknetNetwork;
