@@ -3,7 +3,7 @@ import { ConfigService as NestConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ConfigService {
-  constructor(private configService: NestConfigService) {}
+  constructor(private configService: NestConfigService) { }
 
   get contractAddress(): string {
     return this.configService.get<string>('blockchain.contractAddress')!;

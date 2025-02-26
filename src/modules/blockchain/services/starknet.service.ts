@@ -3,7 +3,7 @@ import { RpcProvider, Contract, Account, CairoVersion } from 'starknet';
 import { ConfigService } from '@/common/config.service';
 import { NFTBalanceDto, NFTMetadataDto } from '../dtos/nft.dto';
 import { TransferDto } from '../dtos/transfer.dto';
-
+import erc1155Abi from '@/common/Abi';
 @Injectable()
 export class StarknetService implements OnModuleInit {
   private readonly logger = new Logger(StarknetService.name);
@@ -43,59 +43,8 @@ export class StarknetService implements OnModuleInit {
     );
 
     try {
-      // Initialize contract
-      const contractAbi = [
-        {
-          name: 'balance_of',
-          type: 'function',
-          inputs: [
-            {
-              name: 'account',
-              type: 'core::starknet::contract_address::ContractAddress',
-            },
-            { name: 'token_id', type: 'core::integer::u256' },
-          ],
-          outputs: [{ type: 'core::integer::u256' }],
-          state_mutability: 'view',
-        },
-        {
-          name: 'uri',
-          type: 'function',
-          inputs: [{ name: 'token_id', type: 'core::integer::u256' }],
-          outputs: [{ type: 'core::byte_array::ByteArray' }],
-          state_mutability: 'view',
-        },
-        {
-          name: 'safe_transfer_from',
-          type: 'function',
-          inputs: [
-            {
-              name: 'from',
-              type: 'core::starknet::contract_address::ContractAddress',
-            },
-            {
-              name: 'to',
-              type: 'core::starknet::contract_address::ContractAddress',
-            },
-            {
-              name: 'token_id',
-              type: 'core::integer::u256',
-            },
-            {
-              name: 'value',
-              type: 'core::integer::u256',
-            },
-            {
-              name: 'data',
-              type: 'core::array::Span::<core::felt252>',
-            },
-          ],
-          outputs: [],
-          state_mutability: 'external',
-        },
-      ] as const;
 
-      this.contract = new Contract(contractAbi, contractAddress, this.provider).typedv2(contractAbi);
+      this.contract = new Contract(erc1155Abi, contractAddress, this.provider).typedv2(erc1155Abi);
 
       this.logger.log('Successfully initialized Starknet contract');
     } catch (error) {
