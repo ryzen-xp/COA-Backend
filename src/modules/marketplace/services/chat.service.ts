@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ChatRepository } from '../repositories/chat.repository';
-import { CreateChatDto } from '../dtos/chat.dto';
-import { ChatEntity } from '../entities/chat.entity';
+import type { ChatRepository } from '../repositories/chat.repository';
+import type { CreateChatDto } from '../dtos/chat.dto';
+import type { ChatEntity } from '../entities/chat.entity';
 
 @Injectable()
 export class ChatService {
   constructor(
-    @InjectRepository(ChatRepository)
+  // @InjectRepository(ChatRepository)
     private chatRepository: ChatRepository,
   ) {}
 
@@ -29,7 +29,7 @@ export class ChatService {
   }
 
   async markAsRead(messageId: number, userId: number): Promise<ChatEntity> {
-    const message = await this.chatRepository.findOne(messageId);
+    const message = await this.chatRepository.findOne({ where: { id: messageId } });
     if (!message || message.receiverId !== userId) {
       throw new Error('Message not found or unauthorized');
     }
