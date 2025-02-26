@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Param, Body } from '@nestjs/common';
-import { LeaderboardService } from '../../game/servides/leaderboard.service';
+import { LeaderboardService } from '../../game/services/leaderboard.service';
 import { LeaderboardDTO } from '../dtos/leaderboard.dto';
 
 @Controller('leaderboard')

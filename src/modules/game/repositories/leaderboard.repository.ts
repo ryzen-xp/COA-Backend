@@ -1,27 +1,26 @@
-import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Leaderboard } from '../../game/entities/laderboard.entity';
+import { Repository, DataSource } from 'typeorm';
+import { Leaderboard } from '../entities/laderboard.entity';
 
 @Injectable()
-export class LeaderboardRepository {
-  constructor(
-    @InjectRepository(Leaderboard)
-    private repository: Repository<Leaderboard>,
-  ) {}
+export class LeaderboardRepository extends Repository<Leaderboard> {
+  constructor(private dataSource: DataSource) {
+    const repository = dataSource.getRepository(Leaderboard);
+    super(repository.target, repository.manager, repository.queryRunner);
+  }
 
   async getTopPlayers(limit: number): Promise<Leaderboard[]> {
-    return this.repository
-      .createQueryBuilder('leaderboard')
+    return this.createQueryBuilder('leaderboard')
       .orderBy('leaderboard.score', 'DESC')
       .limit(limit)
       .getMany();
   }
+
   async getPlayerRank(userId: number): Promise<Leaderboard | null> {
-    return this.repository.findOne({ where: { userId } });
+    return this.findOne({ where: { userId } });
   }
 
   async saveEntry(entry: Leaderboard): Promise<void> {
-    await this.repository.save(entry);
+    await this.save(entry);
   }
 }
