@@ -12,7 +12,7 @@ class ListingController {
                 return res.status(400).json({ errors });
             }
 
-            const listing = await ListingService.create(dto);
+            const listing = await ListingService.createListing(dto);
             return res.status(201).json(listing);
         } catch (error) {
             return res.status(500).json({ message: error.message });
@@ -21,7 +21,7 @@ class ListingController {
 
     async findAll(req: Request, res: Response): Promise<Response> {
         try {
-            const listings = await ListingService.findAll();
+            const listings = await ListingService.findAllListings();
             return res.status(200).json(listings);
         } catch (error) {
             return res.status(500).json({ message: error.message });
@@ -35,7 +35,7 @@ class ListingController {
                 return res.status(400).json({ message: 'Invalid listing ID' });
             }
 
-            const listing = await ListingService.findOne(id);
+            const listing = await ListingService.findOneListing(id);
             if (!listing) {
                 return res.status(404).json({ message: 'Listing not found' });
             }
@@ -58,7 +58,7 @@ class ListingController {
                 return res.status(400).json({ errors });
             }
 
-            await ListingService.update(id, dto);
+            await ListingService.updateListing(id, dto);
             return res.status(200).json({ message: 'Listing updated successfully' });
         } catch (error) {
             return res.status(500).json({ message: error.message });
@@ -72,7 +72,7 @@ class ListingController {
                 return res.status(400).json({ message: 'Invalid listing ID' });
             }
 
-            await ListingService.remove(id);
+            await ListingService.removeListing(id);
             return res.status(200).json({ message: 'Listing deleted successfully' });
         } catch (error) {
             return res.status(500).json({ message: error.message });

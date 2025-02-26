@@ -5,24 +5,24 @@ import { CreateListingDto, UpdateListingDto } from '../dtos/listing.dto';
 class ListingService {
     private listingRepository = getRepository(Listing);
 
-    async create(createListingDto: CreateListingDto): Promise<Listing> {
+    async createListing(createListingDto: CreateListingDto): Promise<Listing> {
         const listing = this.listingRepository.create(createListingDto);
         return this.listingRepository.save(listing);
     }
 
-    async findAll(): Promise<Listing[]> {
+    async findAllListings(): Promise<Listing[]> {
         return this.listingRepository.find();
     }
 
-    async findOne(id: number): Promise<Listing | null> {
+    async findOneListing(id: number): Promise<Listing | null> {
         return this.listingRepository.findOne({ where: { id } });
     }
 
-    async update(id: number, updateListingDto: UpdateListingDto): Promise<void> {
+    async updateListing(id: number, updateListingDto: UpdateListingDto): Promise<void> {
         await this.listingRepository.update(id, updateListingDto);
     }
 
-    async remove(id: number): Promise<void> {
+    async removeListing(id: number): Promise<void> {
         await this.listingRepository.delete(id);
     }
 }
