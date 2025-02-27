@@ -6,10 +6,13 @@ import {
     UpdateDateColumn,
     Index,
     BeforeInsert,
-    BeforeUpdate
+    BeforeUpdate,
+    OneToOne,
+    JoinColumn
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { IsEmail, MinLength } from 'class-validator';
+import { Wallet } from './wallet.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -31,9 +34,6 @@ export class User {
     @MinLength(8)
     password: string;
 
-    @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
-    balance: number;
-
     @Column({ default: false })
     isEmailVerified: boolean;
 
@@ -51,4 +51,9 @@ export class User {
     emailToLowerCase() {
         this.email = this.email.toLowerCase();
     }
+
+    // Relación OneToOne con Wallet
+    @OneToOne(() => Wallet, (wallet) => wallet.user, { cascade: true })
+    @JoinColumn() // Especifica que la clave foránea estará en esta tabla
+    wallet: Wallet;
 }

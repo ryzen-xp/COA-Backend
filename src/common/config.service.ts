@@ -3,7 +3,7 @@ import { ConfigService as NestConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ConfigService {
-  constructor(private configService: NestConfigService) {}
+  constructor(private configService: NestConfigService) { }
 
   get contractAddress(): string {
     return this.configService.get<string>('blockchain.contractAddress')!;
@@ -28,6 +28,7 @@ export class ConfigService {
     const networkUrls: Record<string, string> = {
       'mainnet-alpha': 'https://alpha-mainnet.starknet.io',
       'goerli-alpha': 'https://alpha4.starknet.io',
+      'sepolia-alpha': 'https://starknet-sepolia.public.blastapi.io',
     };
 
     const network = this.starknetNetwork;
