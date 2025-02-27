@@ -8,7 +8,6 @@ import {
 @Entity({ name: 'reviews' })
 export class Review {
   @PrimaryGeneratedColumn()
-  @Column()
   id: number;
 
   @Column()

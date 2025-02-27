@@ -1,91 +1,108 @@
-import { Request, Response } from 'express';
-import ReviewService from '../services/review.service';
 import { CreateReviewDto, UpdateReviewDto } from '../dtos/review.dto';
-import { plainToInstance } from 'class-transformer';
-import { validate } from 'class-validator';
+import { ReviewService } from '../services/review.service';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 
-class ReviewController {
-  async createReview(req: Request, res: Response) {
+@Controller('reviews')
+export class ReviewController {
+  constructor(private readonly reviewService: ReviewService) {}
+
+  @Post()
+  async createReview(@Body() createReviewDto: CreateReviewDto) {
     try {
-      const createReviewDto = plainToInstance(CreateReviewDto, req.body);
-
-      const errors = await validate(createReviewDto);
-
-      if (errors.length > 0) {
-        return res.status(400).json({ errors });
-      }
-
-      const review = await ReviewService.createReview(createReviewDto);
-      res.status(201).json(review);
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
+      return await this.reviewService.createReview(createReviewDto);
+    } catch (error: unknown) {
+      return {
+        statusCode: 400,
+        message:
+          error instanceof Error ? error.message : 'Unknown error occurred',
+      };
     }
   }
 
-  async getReviewById(req: Request, res: Response) {
+  @Get(':id')
+  async getReviewById(@Param('id') id: number) {
     try {
-      const review = await ReviewService.getReviewById(Number(req.params.id));
+      const review = await this.reviewService.getReviewById(id);
       if (!review) {
-        return res.status(404).json({ error: 'Review not found' });
+        return {
+          statusCode: 404,
+          message: 'Review not found',
+        };
       }
-      res.json(review);
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
+      return review;
+    } catch (error: unknown) {
+      return {
+        statusCode: 400,
+        message:
+          error instanceof Error ? error.message : 'Unknown error occurred',
+      };
     }
   }
 
-  async getReviewsByReviewerId(req: Request, res: Response) {
+  @Get('reviewer/:reviewerId')
+  async getReviewsByReviewerId(@Param('reviewerId') reviewerId: number) {
     try {
-      const review = await ReviewService.getReviewsByReviewerId(
-        Number(req.params.reviewerId),
-      );
-
-      res.json(review);
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
+      return await this.reviewService.getReviewsByReviewerId(reviewerId);
+    } catch (error: unknown) {
+      return {
+        statusCode: 400,
+        message:
+          error instanceof Error ? error.message : 'Unknown error occurred',
+      };
     }
   }
 
-  async getReviewsByReviewedId(req: Request, res: Response) {
+  @Get('reviewed/:reviewedId')
+  async getReviewsByReviewedId(@Param('reviewedId') reviewedId: number) {
     try {
-      const review = await ReviewService.getReviewsByReviewedId(
-        Number(req.params.reviewedId),
-      );
-
-      res.json(review);
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
+      return await this.reviewService.getReviewsByReviewedId(reviewedId);
+    } catch (error: unknown) {
+      return {
+        statusCode: 400,
+        message:
+          error instanceof Error ? error.message : 'Unknown error occurred',
+      };
     }
   }
 
-  async updateReview(req: Request, res: Response) {
+  @Put(':id/:reviewerId')
+  async updateReview(
+    @Param('id') id: number,
+    @Param('reviewerId') reviewerId: number,
+    @Body() updateDto: UpdateReviewDto,
+  ) {
     try {
-      const updateDto = plainToInstance(UpdateReviewDto, req.body);
-      const errors = await validate(updateDto);
-      if (errors.length > 0) {
-        return res.status(400).json({ errors });
-      }
-      const review = await ReviewService.updateReview(
-        Number(req.params.id),
-        updateDto,
-      );
-      res.json(review);
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
+      return await this.reviewService.updateReview(id, reviewerId, updateDto);
+    } catch (error: unknown) {
+      return {
+        statusCode: 400,
+        message:
+          error instanceof Error ? error.message : 'Unknown error occurred',
+      };
     }
   }
 
-  async deleteReview(req: Request, res: Response) {
+  @Delete(':id/:reviewerId')
+  async deleteReview(
+    @Param('id') id: number,
+    @Param('reviewerId') reviewerId: number,
+  ) {
     try {
-      await ReviewService.deleteReview(
-        Number(req.params.id),
-        Number(req.params.reviewerId),
-      );
-      res.sendStatus(204);
-    } catch (error) {
-      res.status(400).json({ error: (error as Error).message });
+      return await this.reviewService.deleteReview(id, reviewerId);
+    } catch (error: unknown) {
+      return {
+        statusCode: 400,
+        message:
+          error instanceof Error ? error.message : 'Unknown error occurred',
+      };
     }
   }
 }
-
-export default new ReviewController();

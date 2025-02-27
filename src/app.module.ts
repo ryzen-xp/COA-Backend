@@ -9,6 +9,8 @@ import { LeaderboardModule } from './modules/game/leaderboard.module';
 import { LeaderboardController } from './modules/game/controlller/leaderboard.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Leaderboard } from './modules/game/entities/laderboard.entity';
+import { Review } from './modules/marketplace/entities/review.entity';
+import { ReviewModule } from './modules/marketplace/review.module';
 
 /**
  * Main application module
@@ -37,7 +39,7 @@ import { Leaderboard } from './modules/game/entities/laderboard.entity';
       password: process.env.DB_PASS || '12345',
       database: process.env.DB_NAME || 'coa_database',
       //entities: [__dirname + '//*.entity{.ts,.js}'], // 🟢 Busca todas las entidades
-      entities: [Leaderboard],
+      entities: [Leaderboard, Review],
       synchronize: process.env.NODE_ENV !== 'production', // 🚨 Solo usar en desarrollo
       logging: process.env.NODE_ENV !== 'production',
     }),
@@ -45,8 +47,9 @@ import { Leaderboard } from './modules/game/entities/laderboard.entity';
     BlockchainModule,
     StarknetRouterModule,
     LeaderboardModule,
+    ReviewModule,
     // WalletModule,
   ],
   controllers: [StarknetController, LeaderboardController],
 })
-export class AppModule { }
+export class AppModule {}
