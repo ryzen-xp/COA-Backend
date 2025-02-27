@@ -36,6 +36,7 @@ import { Leaderboard } from './modules/game/entities/laderboard.entity';
       username: process.env.DB_USER || 'postgres',
       password: process.env.DB_PASS || '12345',
       database: process.env.DB_NAME || 'coa_database',
+      ssl: process.env.DB_SSLMODE ? { rejectUnauthorized: false } : false,
       //entities: [__dirname + '//*.entity{.ts,.js}'], // 🟢 Busca todas las entidades
       entities: [Leaderboard],
       synchronize: process.env.NODE_ENV !== 'production', // 🚨 Solo usar en desarrollo
