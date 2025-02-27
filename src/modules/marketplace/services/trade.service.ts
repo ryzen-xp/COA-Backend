@@ -3,13 +3,11 @@ import { TradeRepository } from '../repositories/trade.repository';
 import { CreateTradeDto, UpdateTradeStatusDto } from '../dtos/trade.dto';
 
 class TradeService {
-
   private tradeRepository: TradeRepository;
 
   constructor() {
     this.tradeRepository = new TradeRepository();
   }
-
 
   async createTrade(dto: CreateTradeDto): Promise<Trade> {
     const trade = await this.tradeRepository.create({
@@ -34,9 +32,6 @@ class TradeService {
     tradeId: number,
     dto: UpdateTradeStatusDto,
   ): Promise<Trade> {
-
-    const trade = await TradeRepository.findOne({ where: { id: tradeId } });
-
     const trade = await this.tradeRepository.findById(tradeId);
 
     if (!trade) {
