@@ -1,8 +1,8 @@
 import { getRepository, Repository } from 'typeorm';
 import { Notification } from '../entities/notification.entity';
+import { AppDataSource } from '../../data-source';
 
-
-export const NotificationRepository: Repository<Notification> =
+export const notificationRepo: Repository<Notification> =
   AppDataSource.getRepository(Notification);
 export class NotificationRepository {
   private repo: Repository<Notification>;
@@ -36,4 +36,3 @@ export class NotificationRepository {
     await this.repo.delete(id);
   }
 }
-
