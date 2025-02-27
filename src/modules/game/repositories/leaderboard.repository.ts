@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { Leaderboard } from '../entities/laderboard.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class LeaderboardRepository {
-  private readonly repo: Repository<Leaderboard>;
 
-  constructor(private readonly dataSource: DataSource) {
-    this.repo = this.dataSource.getRepository(Leaderboard);
+  constructor(@InjectRepository(Leaderboard)
+  private readonly repo: Repository<Leaderboard>,
+) {
+    
   }
 
   async create(walletData: Partial<Leaderboard>): Promise<Leaderboard> {

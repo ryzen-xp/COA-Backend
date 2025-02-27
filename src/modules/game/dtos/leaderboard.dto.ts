@@ -32,7 +32,7 @@ export class LeaderboardResponseDTO {
   id: number;
   userId: number;
   score: number;
-  rank: number;
+  rank?: number;
 
   constructor(data: Leaderboard) {
     this.id = data.id;

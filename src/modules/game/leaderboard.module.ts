@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Leaderboard } from './entities/laderboard.entity';
 import { LeaderboardRepository } from './repositories/leaderboard.repository';
 import { LeaderboardService } from './services/leaderboard.service';
-import { LeaderboardController } from './controlller/laderboard.controller';
+import { LeaderboardController } from './controlller/leaderboard.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Leaderboard])],
@@ -11,4 +11,4 @@ import { LeaderboardController } from './controlller/laderboard.controller';
   providers: [LeaderboardService, LeaderboardRepository],
   exports: [LeaderboardService],
 })
-export class LaderboardModule {}
+export class LeaderboardModule {}
