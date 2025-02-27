@@ -1,7 +1,6 @@
-
 import { Repository } from 'typeorm';
 //import { AppDataSource } from '../../../../data-source';
-import { getRepository, Repository } from 'typeorm';
+import { getRepository } from 'typeorm';
 import { NFT } from '../entities/nft.entity';
 
 export class NFTRepository {
