@@ -1,45 +1,32 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './modules/users/user.module';
 import { BlockchainModule } from './modules/blockchain/blockchain.module';
-
 import { MarketplaceModule } from './modules/marketplace/marketplace.module';
-
 import { StarknetRouterModule } from './routers';
 import { StarknetController } from './modules/blockchain/controllers/starknet.controller';
 
-
-/**
- * Main application module
- *
- * Database Configuration (Commented for future use):
- * Uncomment the TypeOrmModule.forRoot() section when:
- * 1. You need to connect to a PostgreSQL database
- * 2. You're moving to production
- *
- * For local testing without database:
- * - Keep TypeOrmModule commented out
- * - Use in-memory storage in services
- */
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    // Database configuration - Uncomment when database connection is needed
-    // TypeOrmModule.forRoot({
-    //   // Production configuration
-    //   type: 'postgres',
-    //   host: process.env.DB_HOST || 'localhost',
-    //   port: parseInt(process.env.DB_PORT) || 5432,
-    //   username: process.env.DB_USERNAME,
-    //   password: process.env.DB_PASSWORD,
-    //   database: process.env.DB_DATABASE,
-    //   entities: [__dirname + '/**/*.entity{.ts,.js}'],
-    //   synchronize: process.env.NODE_ENV !== 'production', // Set to false in production
-    //   logging: process.env.NODE_ENV !== 'production',     // Set to false in production
-    //   ssl: process.env.DB_SSL === 'true',                // Enable SSL in production
-    // }),
+
+    // Configuración de TypeORM para PostgreSQL
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT, 10) || 5432,
+      username: process.env.DB_USERNAME || 'postgres',
+      password: process.env.DB_PASSWORD || 'postgres',
+      database: process.env.DB_DATABASE || 'mydatabase',
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true, // ⚠️ Cambiar a false en producción para evitar pérdida de datos
+      logging: true, // Activa logs de consultas
+      ssl: process.env.DB_SSL === 'true', // Solo para producción si usas SSL
+    }),
+
     UserModule,
     BlockchainModule,
     MarketplaceModule,
