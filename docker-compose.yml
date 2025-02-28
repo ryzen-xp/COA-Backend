@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: coa-backend_db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-coa-backend_database}
+      POSTGRES_USER: ${DB_USER:-coa-backend_user}
+      POSTGRES_PASSWORD: ${DB_PASS:-coa-backend_password}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - coa-backend_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-coa-backend_user} -d ${DB_NAME:-coa-backend_database}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  coa-backend_data:

@@ -1,4 +1,14 @@
 import {
+
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Index,
+  BeforeInsert,
+  BeforeUpdate,
+
     Entity,
     PrimaryGeneratedColumn,
     Column,
@@ -9,6 +19,7 @@ import {
     BeforeUpdate,
     OneToOne,
     JoinColumn
+
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { IsEmail, MinLength } from 'class-validator';
@@ -16,35 +27,50 @@ import { Wallet } from './wallet.entity';
 
 @Entity({ name: 'users' })
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Index()
-    @Column({ unique: true, length: 50 })
-    @MinLength(3)
-    username: string;
+  @Index()
+  @Column({ unique: true, length: 50 })
+  @MinLength(3)
+  username: string;
 
-    @Index()
-    @Column({ unique: true })
-    @IsEmail()
-    email: string;
+  @Index()
+  @Column({ unique: true })
+  @IsEmail()
+  email: string;
 
-    @Column()
-    @Exclude({ toPlainOnly: true })
-    @MinLength(8)
-    password: string;
+  @Column()
+  @Exclude({ toPlainOnly: true })
+  @MinLength(8)
+  password: string;
+
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  balance: number;
+
+  @Column({ default: false })
+  isEmailVerified: boolean;
 
     @Column({ default: false })
     isEmailVerified: boolean;
 
-    @Column({ nullable: true })
-    lastLoginAt: Date;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @Column({ nullable: true })
+  lastLoginAt: Date;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  emailToLowerCase() {
+    this.email = this.email.toLowerCase();
+  }
 
     @BeforeInsert()
     @BeforeUpdate()
@@ -56,4 +82,5 @@ export class User {
     @OneToOne(() => Wallet, (wallet) => wallet.user, { cascade: true })
     @JoinColumn() // Especifica que la clave foránea estará en esta tabla
     wallet: Wallet;
+
 }
