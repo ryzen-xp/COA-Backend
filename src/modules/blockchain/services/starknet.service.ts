@@ -1,16 +1,16 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
-import { RpcProvider, Contract } from 'starknet';
+import { RpcProvider, Contract, Account, CairoVersion } from 'starknet';
 import { ConfigService } from '@/common/config.service';
 import { NFTBalanceDto, NFTMetadataDto } from '../dtos/nft.dto';
 import { TransferDto } from '../dtos/transfer.dto';
-
+import erc1155Abi from '@/common/Abi';
 @Injectable()
 export class StarknetService implements OnModuleInit {
   private readonly logger = new Logger(StarknetService.name);
   private provider: RpcProvider;
   private contract: Contract;
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService) { }
 
   async onModuleInit() {
     try {
@@ -43,59 +43,8 @@ export class StarknetService implements OnModuleInit {
     );
 
     try {
-      // Initialize contract
-      const contractAbi = [
-        {
-          name: 'balance_of',
-          type: 'function',
-          inputs: [
-            {
-              name: 'account',
-              type: 'core::starknet::contract_address::ContractAddress',
-            },
-            { name: 'token_id', type: 'core::integer::u256' },
-          ],
-          outputs: [{ type: 'core::integer::u256' }],
-          state_mutability: 'view',
-        },
-        {
-          name: 'uri',
-          type: 'function',
-          inputs: [{ name: 'token_id', type: 'core::integer::u256' }],
-          outputs: [{ type: 'core::byte_array::ByteArray' }],
-          state_mutability: 'view',
-        },
-        {
-          name: 'safe_transfer_from',
-          type: 'function',
-          inputs: [
-            {
-              name: 'from',
-              type: 'core::starknet::contract_address::ContractAddress',
-            },
-            {
-              name: 'to',
-              type: 'core::starknet::contract_address::ContractAddress',
-            },
-            {
-              name: 'token_id',
-              type: 'core::integer::u256',
-            },
-            {
-              name: 'value',
-              type: 'core::integer::u256',
-            },
-            {
-              name: 'data',
-              type: 'core::array::Span::<core::felt252>',
-            },
-          ],
-          outputs: [],
-          state_mutability: 'external',
-        },
-      ];
 
-      this.contract = new Contract(contractAbi, contractAddress, this.provider);
+      this.contract = new Contract(erc1155Abi, contractAddress, this.provider).typedv2(erc1155Abi);
 
       this.logger.log('Successfully initialized Starknet contract');
     } catch (error) {
@@ -163,40 +112,68 @@ export class StarknetService implements OnModuleInit {
 
   async getTokenURI(tokenId: string): Promise<NFTMetadataDto> {
     try {
-      const uriResponse = await this.contract.call('uri', [
+      const uriResponse = await this.contract.callStatic.uri(
         { low: BigInt(tokenId), high: BigInt(0) },
-      ]);
+      );
 
-      if (!uriResponse || !uriResponse[0]?.data) {
-        throw new Error(`No metadata found for token ID ${tokenId}`);
+      if (!uriResponse) {
+        return { tokenId, uri: "" };
       }
 
-      const uriData = uriResponse[0].data
-        .map((felt: any) => Buffer.from(felt, 'hex').toString())
-        .join('');
-      return { tokenId, uri: uriData };
+      return { tokenId, uri: uriResponse };
     } catch (error) {
       this.logger.error(`Error fetching token URI: ${error.message}`);
       throw new Error(`Failed to fetch token URI for ID ${tokenId}`);
     }
   }
 
-  async transferNFT(transferDto: TransferDto): Promise<void> {
+  async transferNFT(transferDto: TransferDto): Promise<{ hash: string }> {
     try {
-      const { from, to, tokenId } = transferDto;
-      await this.contract.invoke('safe_transfer_from', [
-        BigInt(from),
-        BigInt(to),
-        { low: BigInt(tokenId), high: BigInt(0) },
-        { low: BigInt(1), high: BigInt(0) },
-        [],
-      ]);
-      this.logger.log(
-        `Successfully transferred token ${tokenId} from ${from} to ${to}`,
+      const { to, tokenId } = transferDto;
+
+      // Get admin account from config
+      const adminAddress = this.configService.walletAddress;
+      const adminPrivateKey = this.configService.walletPrivateKey;
+
+      if (!adminPrivateKey) {
+        throw new Error('Admin private key is not configured');
+      }
+
+      // Create account object for signing
+      const account = new Account(
+        this.provider,
+        adminAddress,
+        adminPrivateKey,
+        '1'
       );
+
+      this.logger.log(`Attempting to transfer token ${tokenId} from ${adminAddress} to ${to}`);
+
+      // Execute a simple transfer directly using the account
+      const tx = await account.execute([
+        {
+          contractAddress: this.contract.address,
+          entrypoint: "safe_transfer_from",
+          calldata: [
+            adminAddress,  // from
+            to,            // to
+            tokenId,       // token_id low
+            "0",           // token_id high
+            "1",           // value low
+            "0",           // value high
+            "0"            // empty data array length
+          ]
+        }
+      ]);
+
+      this.logger.log(
+        `Successfully initiated transfer of token ${tokenId} to ${to}. Transaction hash: ${tx.transaction_hash}`,
+      );
+
+      return { hash: tx.transaction_hash };
     } catch (error) {
-      this.logger.error(`Error transferring NFT: ${error.message}`);
-      throw new Error(`Failed to transfer token ${transferDto.tokenId}`);
+      this.logger.error(`Error transferring NFT: ${error.message}`, error.stack);
+      throw new Error(`Failed to transfer token ${transferDto.tokenId}: ${error.message}`);
     }
   }
 }
