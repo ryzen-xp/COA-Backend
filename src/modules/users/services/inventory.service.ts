@@ -7,8 +7,8 @@ import { CreateInventoryDto, UpdateInventoryDto } from '../dtos/inventory.dto';
 export class InventoryService {
   constructor(private readonly inventoryRepo: InventoryRepository) {}
 
-  async addItem(dto: CreateInventoryDto): Promise<Inventory> {
-    return await this.inventoryRepo.createInventory(dto);
+  async addItem(userId: number, dto: CreateInventoryDto): Promise<Inventory> {
+    return await this.inventoryRepo.createInventory(userId, dto);
   }
 
   async getUserInventory(userId: number): Promise<Inventory[]> {

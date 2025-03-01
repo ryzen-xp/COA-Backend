@@ -39,7 +39,7 @@ import { InventoryModule } from './modules/users/inventory.module';
       database: process.env.DB_NAME || 'coa_database',
       ssl: process.env.DB_SSLMODE ? { rejectUnauthorized: false } : false,
       //entities: [__dirname + '//*.entity{.ts,.js}'], // 🟢 Busca todas las entidades
-      entities: [__dirname + '//*.entity{.ts,.js}'],
+      entities: [__dirname + '/../**/*.entity.js'],
       synchronize: process.env.NODE_ENV !== 'production', // 🚨 Solo usar en desarrollo
       logging: process.env.NODE_ENV !== 'production',
     }),

@@ -15,9 +15,12 @@ import { Inventory } from '../entities/inventory.entity';
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
-  @Post()
-  async addItem(@Body() dto: CreateInventoryDto): Promise<Inventory> {
-    return this.inventoryService.addItem(dto);
+  @Post(':userId')
+  async addItem(
+    @Param('userId') userId: number,
+    @Body() dto: CreateInventoryDto,
+  ): Promise<Inventory> {
+    return this.inventoryService.addItem(userId, dto);
   }
 
   @Get(':userId')
