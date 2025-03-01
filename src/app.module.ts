@@ -8,7 +8,8 @@ import { StarknetController } from './modules/blockchain/controllers/starknet.co
 import { LeaderboardModule } from './modules/game/leaderboard.module';
 import { LeaderboardController } from './modules/game/controlller/leaderboard.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Leaderboard } from './modules/game/entities/laderboard.entity';
+// import { Leaderboard } from './modules/game/entities/laderboard.entity';
+import { InventoryModule } from './modules/users/inventory.module';
 
 /**
  * Main application module
@@ -38,7 +39,7 @@ import { Leaderboard } from './modules/game/entities/laderboard.entity';
       database: process.env.DB_NAME || 'coa_database',
       ssl: process.env.DB_SSLMODE ? { rejectUnauthorized: false } : false,
       //entities: [__dirname + '//*.entity{.ts,.js}'], // 🟢 Busca todas las entidades
-      entities: [Leaderboard],
+      entities: [__dirname + '//*.entity{.ts,.js}'],
       synchronize: process.env.NODE_ENV !== 'production', // 🚨 Solo usar en desarrollo
       logging: process.env.NODE_ENV !== 'production',
     }),
@@ -46,6 +47,7 @@ import { Leaderboard } from './modules/game/entities/laderboard.entity';
     BlockchainModule,
     StarknetRouterModule,
     LeaderboardModule,
+    InventoryModule,
     // WalletModule,
   ],
   controllers: [StarknetController, LeaderboardController],
