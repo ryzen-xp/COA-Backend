@@ -1,5 +1,4 @@
 import {
-
   Entity,
   PrimaryGeneratedColumn,
   Column,
@@ -8,22 +7,14 @@ import {
   Index,
   BeforeInsert,
   BeforeUpdate,
-
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    CreateDateColumn,
-    UpdateDateColumn,
-    Index,
-    BeforeInsert,
-    BeforeUpdate,
-    OneToOne,
-    JoinColumn
-
+  OneToOne,
+  JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { IsEmail, MinLength } from 'class-validator';
 import { Wallet } from './wallet.entity';
+import { Inventory } from './inventory.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -45,16 +36,11 @@ export class User {
   @MinLength(8)
   password: string;
 
-
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   balance: number;
 
   @Column({ default: false })
   isEmailVerified: boolean;
-
-    @Column({ default: false })
-    isEmailVerified: boolean;
-
 
   @Column({ nullable: true })
   lastLoginAt: Date;
@@ -65,22 +51,18 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-
   @BeforeInsert()
   @BeforeUpdate()
   emailToLowerCase() {
     this.email = this.email.toLowerCase();
   }
 
-    @BeforeInsert()
-    @BeforeUpdate()
-    emailToLowerCase() {
-        this.email = this.email.toLowerCase();
-    }
+  // Relación OneToOne con Wallet
+  @OneToOne(() => Wallet, (wallet) => wallet.user, { cascade: true })
+  @JoinColumn() // Especifica que la clave foránea estará en esta tabla
+  wallet: Wallet;
 
-    // Relación OneToOne con Wallet
-    @OneToOne(() => Wallet, (wallet) => wallet.user, { cascade: true })
-    @JoinColumn() // Especifica que la clave foránea estará en esta tabla
-    wallet: Wallet;
-
+  // Relación OneToMany con Inventory
+  @OneToMany(() => Inventory, (inventory) => inventory.user, { cascade: true })
+  inventory: Inventory[];
 }
