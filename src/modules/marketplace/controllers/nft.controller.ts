@@ -52,12 +52,27 @@ export class NFTController {
   @Put(':id/listing')
   async updateNFTListing(@Param('id') id: number, @Body() updateDto: UpdateNFTListingDto) {
     try {
+
+      const updateDto = plainToInstance(UpdateNFTListingDto, req.body);
+      const errors = await validate(updateDto);
+      if (errors.length > 0) {
+        return res.status(400).json({ errors });
+      }
+      const nft = await NFTService.updateNFTListing(
+        Number(req.params.id),
+        updateDto,
+      );
+      res.json(nft);
+    } catch (error) {
+      res.status(400).json({ error: (error as Error).message });
+
       return await this.nftService.updateNFTListing(id, updateDto);
     } catch (error: unknown) {
       return {
         statusCode: 400,
         message: error instanceof Error ? error.message : 'Failed to update NFT listing',
       };
+
     }
   }
 }

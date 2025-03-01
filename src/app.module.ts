@@ -1,8 +1,10 @@
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './modules/users/user.module';
 import { BlockchainModule } from './modules/blockchain/blockchain.module';
+import { MarketplaceModule } from './modules/marketplace/marketplace.module';
 import { StarknetRouterModule } from './routers';
 import { StarknetController } from './modules/blockchain/controllers/starknet.controller';
 import { LeaderboardModule } from './modules/game/leaderboard.module';
@@ -10,25 +12,16 @@ import { LeaderboardController } from './modules/game/controlller/leaderboard.co
 import { TypeOrmModule } from '@nestjs/typeorm';
 // import { Leaderboard } from './modules/game/entities/laderboard.entity';
 import { InventoryModule } from './modules/users/inventory.module';
+import { Leaderboard } from './modules/game/entities/laderboard.entity';
+import { Review } from './modules/marketplace/entities/review.entity';
+import { ReviewModule } from './modules/marketplace/review.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
-/**
- * Main application module
- *
- * Database Configuration (Commented for future use):
- * Uncomment the TypeOrmModule.forRoot() section when:
- * 1. You need to connect to a PostgreSQL database
- * 2. You're moving to production
- *
- * For local testing without database:
- * - Keep TypeOrmModule commented out
- * - Use in-memory storage in services
- */
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-    //Database configuration - Uncomment when database connection is needed
+    ConfigModule.forRoot({ isGlobal: true }),
+    ScheduleModule.forRoot(),
+
     TypeOrmModule.forRoot({
       name: 'default',
       type: 'postgres',
@@ -37,19 +30,18 @@ import { InventoryModule } from './modules/users/inventory.module';
       username: process.env.DB_USER || 'postgres',
       password: process.env.DB_PASS || '12345',
       database: process.env.DB_NAME || 'coa_database',
-      ssl: process.env.DB_SSLMODE ? { rejectUnauthorized: false } : false,
-      //entities: [__dirname + '//*.entity{.ts,.js}'], // 🟢 Busca todas las entidades
-      entities: [__dirname + '/../**/*.entity.js'],
+      entities: [Leaderboard, Review], // 🟢 Busca solo las entidades necesarias
       synchronize: process.env.NODE_ENV !== 'production', // 🚨 Solo usar en desarrollo
       logging: process.env.NODE_ENV !== 'production',
     }),
+
     UserModule,
     BlockchainModule,
+    MarketplaceModule,
     StarknetRouterModule,
     LeaderboardModule,
-    InventoryModule,
-    // WalletModule,
+    ReviewModule,
   ],
   controllers: [StarknetController, LeaderboardController],
 })
-export class AppModule { }
+export class AppModule {}

@@ -36,6 +36,9 @@ export class User {
   @MinLength(8)
   password: string;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  balance: number;
+
   @Column({ default: false })
   isEmailVerified: boolean;
 
@@ -59,6 +62,7 @@ export class User {
   @JoinColumn() // Especifica que la clave foránea estará en esta tabla
   wallet: Wallet;
 
+  // Relación OneToMany con Inventory
   @OneToMany(() => Inventory, (inventory) => inventory.user, { cascade: true })
   inventory: Inventory[];
 }

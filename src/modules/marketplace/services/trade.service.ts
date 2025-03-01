@@ -33,6 +33,7 @@ class TradeService {
     dto: UpdateTradeStatusDto,
   ): Promise<Trade> {
     const trade = await this.tradeRepository.findById(tradeId);
+
     if (!trade) {
       throw new Error('Trade not found');
     }
