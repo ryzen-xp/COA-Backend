@@ -127,18 +127,16 @@ export class StarknetService implements OnModuleInit {
     }
   }
 
-  async transferNFT(transferDto: TransferDto): Promise<{ hash: string }> {
+  async mintToken(tokenId: string, amount: number): Promise<{ hash: string }> {
     try {
-      const { to, tokenId } = transferDto;
-
-      // Get admin account from config
+      // Get wallet address for minting
       const adminAddress = this.configService.walletAddress;
       const adminPrivateKey = this.configService.walletPrivateKey;
-
+  
       if (!adminPrivateKey) {
         throw new Error('Admin private key is not configured');
       }
-
+  
       // Create account object for signing
       const account = new Account(
         this.provider,
@@ -146,10 +144,89 @@ export class StarknetService implements OnModuleInit {
         adminPrivateKey,
         '1'
       );
+  
+      this.logger.log(`Attempting to mint ${amount} token(s) with ID ${tokenId} to ${adminAddress}`);
+  
+      // Execute the mint function
+      const tx = await account.execute([
+        {
+          contractAddress: this.contract.address,
+          entrypoint: "mint",
+          calldata: [
+            adminAddress,  // account to mint to
+            tokenId,       // token_id low
+            "0",           // token_id high
+            amount.toString(), // value low
+            "0",           // value high
+          ]
+        }
+      ]);
+  
+      // Wait for transaction confirmation
+      try {
+        const receipt = await this.provider.waitForTransaction(tx.transaction_hash, { retryInterval: 2000 });
+        this.logger.log(`Transaction receipt received: ${JSON.stringify(receipt)}`);
+        
+        if ((receipt as any).execution_status !== 'SUCCEEDED') {
+          throw new Error(`Transaction failed with status: ${(receipt as any).execution_status}`);
+        }
+      } catch (error) {
+        this.logger.error(`Transaction confirmation failed: ${error.message}`);
+        throw new Error(`Transaction could not be confirmed: ${error.message}`);
+      }
+  
+      this.logger.log(
+        `Successfully minted ${amount} token(s) with ID ${tokenId} to ${adminAddress}. Transaction hash: ${tx.transaction_hash}`,
+      );
+  
+      return { hash: tx.transaction_hash };
+    } catch (error) {
+      this.logger.error(`Error minting token: ${error.message}`, error.stack);
+      throw new Error(`Failed to mint token ${tokenId}: ${error.message}`);
+    }
+  }
 
-      this.logger.log(`Attempting to transfer token ${tokenId} from ${adminAddress} to ${to}`);
-
-      // Execute a simple transfer directly using the account
+  async transferNFT(transferDto: TransferDto): Promise<{ hash: string }> {
+    try {
+      const { to, tokenId, amount = 1 } = transferDto;
+  
+      // Validate recipient address
+      if (!to.startsWith('0x') || !/^0x[0-9a-fA-F]{1,64}$/.test(to)) {
+        throw new Error('Invalid recipient address format: must be a valid StarkNet address');
+      }
+  
+      // Get admin account from config
+      const adminAddress = this.configService.walletAddress;
+      const adminPrivateKey = this.configService.walletPrivateKey;
+  
+      if (!adminPrivateKey) {
+        throw new Error('Admin private key is not configured');
+      }
+  
+      // Check the token balance before transfer
+      try {
+        const balanceResult = await this.getBalance(adminAddress, tokenId);
+        const currentBalance = Number(balanceResult.balance);
+        
+        if (currentBalance < amount) {
+          throw new Error(`Insufficient token balance. Available: ${currentBalance}, Requested: ${amount}`);
+        }
+      } catch (error) {
+        this.logger.error(`Error checking token balance: ${error.message}`);
+        throw new Error(`Failed to verify token balance: ${error.message}`);
+      }
+  
+      // Create account object for signing
+      const account = new Account(
+        this.provider,
+        adminAddress,
+        adminPrivateKey,
+        '1'
+      );
+  
+      this.logger.log(`Attempting to transfer ${amount} token(s) with ID ${tokenId} from ${adminAddress} to ${to}`);
+  
+      // Execute a transfer using the safe_transfer_from entrypoint
       const tx = await account.execute([
         {
           contractAddress: this.contract.address,
@@ -159,20 +236,33 @@ export class StarknetService implements OnModuleInit {
             to,            // to
             tokenId,       // token_id low
             "0",           // token_id high
-            "1",           // value low
+            amount.toString(),  // value low
             "0",           // value high
             "0"            // empty data array length
           ]
         }
       ]);
-
+  
+      // Wait for transaction confirmation
+      try {
+        const receipt = await this.provider.waitForTransaction(tx.transaction_hash, { retryInterval: 2000 });
+        this.logger.log(`Transaction receipt received: ${JSON.stringify(receipt)}`);
+        
+        if ((receipt as any).execution_status !== 'SUCCEEDED') {
+          throw new Error(`Transaction failed with status: ${(receipt as any).execution_status}`);
+        }
+      } catch (error) {
+        this.logger.error(`Transaction confirmation failed: ${error.message}`);
+        throw new Error(`Transaction could not be confirmed: ${error.message}`);
+      }
+  
       this.logger.log(
-        `Successfully initiated transfer of token ${tokenId} to ${to}. Transaction hash: ${tx.transaction_hash}`,
+        `Successfully transferred ${amount} token(s) with ID ${tokenId} from ${adminAddress} to ${to}. Transaction hash: ${tx.transaction_hash}`,
       );
-
+  
       return { hash: tx.transaction_hash };
     } catch (error) {
-      this.logger.error(`Error transferring NFT: ${error.message}`, error.stack);
+      this.logger.error(`Error transferring token: ${error.message}`, error.stack);
       throw new Error(`Failed to transfer token ${transferDto.tokenId}: ${error.message}`);
     }
   }
