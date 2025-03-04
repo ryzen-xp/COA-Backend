@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { getRepository } from 'typeorm';
 
 import { Injectable } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource} from 'typeorm';
 
 import { NFT } from '../entities/nft.entity';
 

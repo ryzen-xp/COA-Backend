@@ -9,7 +9,6 @@ import { StarknetRouterModule } from './routers';
 import { StarknetController } from './modules/blockchain/controllers/starknet.controller';
 import { LeaderboardModule } from './modules/game/leaderboard.module';
 import { LeaderboardController } from './modules/game/controlller/leaderboard.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
 // import { Leaderboard } from './modules/game/entities/laderboard.entity';
 import { InventoryModule } from './modules/users/inventory.module';
 import { Leaderboard } from './modules/game/entities/laderboard.entity';
