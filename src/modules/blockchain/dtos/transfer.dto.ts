@@ -4,7 +4,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class TransferDto {
   @ApiProperty({
     description: 'Destination account address',
-    example: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890'
+    example:
+      '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
   })
   @IsString()
   @IsNotEmpty()
@@ -12,7 +13,7 @@ export class TransferDto {
 
   @ApiProperty({
     description: 'Token ID to transfer',
-    example: '1'
+    example: '1',
   })
   @IsString()
   @IsNotEmpty()
@@ -21,7 +22,7 @@ export class TransferDto {
   @ApiProperty({
     description: 'Amount of tokens to transfer',
     example: 1,
-    default: 1
+    default: 1,
   })
   @IsInt()
   @Min(1)
