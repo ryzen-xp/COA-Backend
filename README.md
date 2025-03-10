@@ -1,3 +1,6 @@
+![Citizen of Arcanis Banner](https://drive.google.com/uc?export=view&id=1cdj5-PQYFpt1LNz9va0Bdug3B1OhRs0b)
+
+
 # Citizen of Arcanis Backend
 
 ## 📌 Prerequisites
