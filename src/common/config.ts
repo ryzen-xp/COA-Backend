@@ -1,24 +1,22 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService as NestConfigService } from '@nestjs/config';
+import dotenv from 'dotenv';
 
-@Injectable()
-export class ConfigService {
-  constructor(private configService: NestConfigService) { }
+dotenv.config();
 
+export class Config {
   get contractAddress(): string {
-    return this.configService.get<string>('blockchain.contractAddress')!;
+    return process.env.CONTRACT_ADDRESS!;
   }
 
   get walletAddress(): string {
-    return this.configService.get<string>('blockchain.walletAddress')!;
+    return process.env.WALLET_ADDRESS!;
   }
 
   get walletPrivateKey(): string {
-    return this.configService.get<string>('blockchain.walletPrivateKey')!;
+    return process.env.WALLET_PRIVATE_KEY!;
   }
 
   get starknetNetwork(): string {
-    return this.configService.get<string>('blockchain.starknetNetwork')!;
+    return process.env.STARKNET_NETWORK!;
   }
 
   /**
@@ -35,3 +33,5 @@ export class ConfigService {
     return networkUrls[network] || network;
   }
 }
+
+export const config = new Config();
