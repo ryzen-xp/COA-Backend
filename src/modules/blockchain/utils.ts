@@ -1,6 +1,6 @@
-import { Contract, RpcProvider, Account } from "starknet";
-import { config } from "./config";
-import erc1155Abi from "./Abi";
+import { Contract, RpcProvider, Account } from 'starknet';
+import { config } from '../../common/config';
+import erc1155Abi from '../../common/Abi';
 
 const utils = {
   initializeProvider() {
@@ -21,7 +21,7 @@ const utils = {
       config.walletAddress,
       config.walletPrivateKey,
       undefined,
-      "0x3"
+      '0x3',
     );
     return account;
   },

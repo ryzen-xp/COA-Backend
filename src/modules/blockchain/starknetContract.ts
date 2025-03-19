@@ -1,10 +1,10 @@
-import { cairo } from "starknet";
-import { config } from "./config";
-import utils from "./utils";
+import { cairo } from 'starknet';
+import { config } from '../../common/config';
+import utils from './utils';
 
 const Contract = {
   async getBlock(): Promise<any> {
-    return await utils.initializeProvider().getBlock("latest");
+    return await utils.initializeProvider().getBlock('latest');
   },
 
   async getContractStatus(): Promise<any> {
@@ -12,25 +12,25 @@ const Contract = {
     const walletAddress = BigInt(config.walletAddress);
     const balance = await utils
       .initializeContract()
-      .call("balance_of", [walletAddress, tokenId]);
+      .call('balance_of', [walletAddress, tokenId]);
     return JSON.parse(
       JSON.stringify(balance, (_, v) =>
-        typeof v === "bigint" ? v.toString() : v
-      )
+        typeof v === 'bigint' ? v.toString() : v,
+      ),
     );
   },
 
   async getBalance(account: string, tokenId: string): Promise<any> {
     const balance = await utils
       .initializeContract()
-      .call("balance_of", [
+      .call('balance_of', [
         BigInt(account),
         { low: BigInt(tokenId), high: BigInt(0) },
       ]);
     return JSON.parse(
       JSON.stringify(balance, (_, v) =>
-        typeof v === "bigint" ? v.toString() : v
-      )
+        typeof v === 'bigint' ? v.toString() : v,
+      ),
     );
   },
 
@@ -46,7 +46,7 @@ const Contract = {
     const account = utils.initializeAccount();
     const mintCall = {
       contractAddress: utils.initializeContract().address,
-      entrypoint: "mint",
+      entrypoint: 'mint',
       calldata: [
         config.walletAddress,
         cairo.uint256(BigInt(tokenId)),
@@ -63,7 +63,7 @@ const Contract = {
   async transferNFT(
     to: string,
     tokenId: string,
-    amount: number
+    amount: number,
   ): Promise<string> {
     const account = utils.initializeAccount();
     const balance = await this.getBalance(config.walletAddress, tokenId);
@@ -75,8 +75,8 @@ const Contract = {
     const tx = await account.execute([
       {
         contractAddress: config.contractAddress,
-        entrypoint: "safe_transfer_from",
-        calldata: [config.walletAddress, to, tokenId, "0", amount, "0", "0"],
+        entrypoint: 'safe_transfer_from',
+        calldata: [config.walletAddress, to, tokenId, '0', amount, '0', '0'],
       },
     ]);
 
