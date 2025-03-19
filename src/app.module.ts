@@ -6,7 +6,7 @@ import { UserModule } from './modules/users/user.module';
 import { BlockchainModule } from './modules/blockchain/blockchain.module';
 import { MarketplaceModule } from './modules/marketplace/marketplace.module';
 import { StarknetRouterModule } from './routers';
-import { StarknetController } from './modules/blockchain/controllers/starknet.controller';
+import { StarknetController } from './modules/blockchain/starknet.controller';
 import { LeaderboardModule } from './modules/game/leaderboard.module';
 import { LeaderboardController } from './modules/game/controlller/leaderboard.controller';
 // import { Leaderboard } from './modules/game/entities/laderboard.entity';

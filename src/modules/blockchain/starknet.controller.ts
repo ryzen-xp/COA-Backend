@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Param, Body, Response } from '@nestjs/common';
 import { Response as Res } from 'express';
-import { StarknetService } from '../services/starknet.service';
-import { TransferDto } from '../dtos/transfer.dto';
+import { StarknetService } from '../blockchain/starknet.service';
 import {
   ApiTags,
   ApiOperation,
@@ -9,7 +8,6 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
-import { num } from 'starknet';
 
 @ApiTags('blockchain')
 @Controller('blockchain')
@@ -95,7 +93,7 @@ export class StarknetController {
   @ApiResponse({ status: 500, description: 'Minting failed' })
   @Post('mint')
   async mintToken(
-    @Body('tokenId') tokenId: number,
+    @Body('tokenId') tokenId: string,
     @Body('amount') amount: number,
     @Response() res: Res,
   ): Promise<void> {
@@ -106,29 +104,48 @@ export class StarknetController {
         hash: response.hash,
       });
     } catch (error) {
-      console.error('Token minting failed:', error);
       res.status(500).json({ message: `Minting failed: ${error.message}` });
     }
   }
 
-  @ApiOperation({ summary: 'Transfer tokens between accounts' })
-  @ApiBody({ type: TransferDto, description: 'Transfer details' })
-  @ApiResponse({ status: 200, description: 'Tokens transferred successfully' })
-  @ApiResponse({ status: 500, description: 'Internal server error' })
+  @ApiOperation({ summary: 'Transfer a token' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        to: { type: 'string', description: 'Recipient address' },
+        tokenId: { type: 'string', description: 'Token ID' },
+        amount: {
+          type: 'number',
+          description: 'Amount to transfer',
+          nullable: true,
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Token transferred successfully' })
+  @ApiResponse({ status: 500, description: 'Transfer failed' })
   @Post('transfer')
-  async transferNFT(
-    @Body() transferDto: TransferDto,
+  async transferToken(
     @Response() res: Res,
+    @Body('to') to: string,
+    @Body('tokenId') tokenId: string,
+    @Body('amount') amount?: number,
   ): Promise<void> {
     try {
-      const tx = await this.starknetService.transferNFT(transferDto);
+      const response = await this.starknetService.transferNFT(
+        to,
+        tokenId,
+        amount,
+      );
       res.status(200).json({
-        message: `${transferDto.amount || 1} token(s) with ID ${transferDto.tokenId} transferred to ${transferDto.to}`,
-        hash: tx.hash,
-        explorerUrl: `https://sepolia.starkscan.co/tx/${tx.hash}`,
+        message: 'Token transferred successfully',
+        hash: response.hash,
       });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({
+        message: `Transfer failed: ${error.message}`,
+      });
     }
   }
 }
