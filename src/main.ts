@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
+import expressApp from '../src/modules/blockchain/index';
 
 async function bootstrap() {
   try {
@@ -168,6 +169,8 @@ async function bootstrap() {
         showRequestDuration: true,
       },
     });
+
+    app.use('/starknet', expressApp);
 
     // Start the server
     const port = process.env.PORT || 4000;

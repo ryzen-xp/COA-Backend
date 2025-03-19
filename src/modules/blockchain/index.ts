@@ -1,12 +1,11 @@
-import express, { Request, Response } from "express";
-import Contract from "./starknetContract";
+import express, { Request, Response } from 'express';
+import Contract from './starknetContract';
 
 const app = express();
-const port = 3000;
 
 app.use(express.json());
 
-app.get("/block", async (req: Request, res: Response) => {
+app.get('/block', async (req: Request, res: Response) => {
   try {
     const block = await Contract.getBlock();
     res.status(200).json(block);
@@ -15,7 +14,7 @@ app.get("/block", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/contract-status", async (req: Request, res: Response) => {
+app.get('/contract-status', async (req: Request, res: Response) => {
   try {
     const status = await Contract.getContractStatus();
     res.status(200).json(status);
@@ -24,7 +23,7 @@ app.get("/contract-status", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/balance/:account/:tokenId", async (req: Request, res: Response) => {
+app.get('/balance/:account/:tokenId', async (req: Request, res: Response) => {
   const { account, tokenId } = req.params;
   try {
     const balance = await Contract.getBalance(account, tokenId);
@@ -34,7 +33,7 @@ app.get("/balance/:account/:tokenId", async (req: Request, res: Response) => {
   }
 });
 
-app.get("/token/:tokenId", async (req: Request, res: Response) => {
+app.get('/token/:tokenId', async (req: Request, res: Response) => {
   const { tokenId } = req.params;
   try {
     const metadata = await Contract.getTokenURI(tokenId);
@@ -44,12 +43,12 @@ app.get("/token/:tokenId", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/mint", async (req: Request, res: Response) => {
+app.post('/mint', async (req: Request, res: Response) => {
   const { tokenId, amount } = req.body;
   try {
     const response = await Contract.mintToken(tokenId, amount);
     res.status(200).json({
-      message: "Token minted successfully",
+      message: 'Token minted successfully',
       hash: response,
     });
   } catch (error) {
@@ -59,12 +58,12 @@ app.post("/mint", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/transfer", async (req: Request, res: Response) => {
+app.post('/transfer', async (req: Request, res: Response) => {
   const { to, tokenId, amount } = req.body;
   try {
     const response = await Contract.transferNFT(to, tokenId, amount);
     res.status(200).json({
-      message: "Token transferred successfully",
+      message: 'Token transferred successfully',
       hash: response,
     });
   } catch (error) {
@@ -74,6 +73,4 @@ app.post("/transfer", async (req: Request, res: Response) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+export default app;
