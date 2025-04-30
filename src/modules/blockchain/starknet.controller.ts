@@ -67,6 +67,7 @@ export class StarknetController {
       return res.status(200).json({
         message: 'Fungable Token minted successfully',
         hash: txHash,
+        explorer: `https://sepolia.starkscan.co/tx/${txHash}`,
       });
     } catch (error) {
       return res
@@ -84,13 +85,14 @@ export class StarknetController {
     try {
       const txHash = await this.contractService.mintNFToken(recipient, tokenId);
       return res.status(200).json({
-        message: 'Nono Fungable Token minted successfully',
+        message: 'Non_Fungable_Token_mintedsuccessfully',
         hash: txHash,
+        explorer: `https://sepolia.starkscan.co/tx/${txHash}`,
       });
     } catch (error) {
       return res
         .status(500)
-        .json({ message: `NFT Minting failed: ${error.message}` });
+        .json({ message: `NFTMinting_failed: ${error.message}` });
     }
   }
 
@@ -103,7 +105,7 @@ export class StarknetController {
   ) {
     if (!tokenIds || !amounts) {
       return res.status(400).json({
-        message: 'Both tokenIds and amounts arrays are required',
+        message: 'Both_tokenIds_and_amountsarrays_are_required',
       });
     }
 
@@ -126,8 +128,9 @@ export class StarknetController {
         recipient,
       );
       return res.status(200).json({
-        message: 'Tokens batch minted successfully',
+        message: 'Tokens_batchminted_successfully',
         hash: txHash,
+        explorer: `https://sepolia.starkscan.co/tx/${txHash}`,
       });
     } catch (error) {
       return res
@@ -152,6 +155,7 @@ export class StarknetController {
       return res.status(200).json({
         message: 'Token transferred successfully',
         hash: txHash,
+        explorer: `https://sepolia.starkscan.co/tx/${txHash}`,
       });
     } catch (error) {
       return res
